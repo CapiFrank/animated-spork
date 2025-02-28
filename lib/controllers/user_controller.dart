@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/model.dart';
-import 'package:project_cipher/utils/hash.dart';
+import '../utils/hash.dart';
 import '../models/user.dart';
 
 class CompanyController extends ChangeNotifier {

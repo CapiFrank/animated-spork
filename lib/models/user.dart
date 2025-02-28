@@ -1,5 +1,4 @@
-import 'package:project_cipher/models/post.dart';
-
+import 'post.dart';
 import 'model.dart';
 
 class User extends Model {

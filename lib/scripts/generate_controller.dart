@@ -1,68 +1,123 @@
 import 'dart:io';
 
 String camelCaseToSnakeCase(String input) {
-  // Inicializamos una cadena vacía para almacenar el resultado
-  String result = '';
+  return input.replaceAllMapped(RegExp(r'([a-z])([A-Z])'), (match) {
+    return '${match.group(1)}_${match.group(2)?.toLowerCase()}';
+  }).toLowerCase();
+}
 
-  // Recorremos cada carácter de la cadena de entrada
-  for (int i = 0; i < input.length; i++) {
-    // Obtenemos el carácter actual
-    String char = input[i];
-
-    // Si el carácter es una letra mayúscula y no es el primer carácter
-    if (char == char.toUpperCase() && i != 0) {
-      // Añadimos un guión bajo antes de la letra mayúscula
-      result += '_';
-    }
-
-    // Añadimos el carácter en minúscula al resultado
-    result += char.toLowerCase();
+String pluralize(String word) {
+  if (word.endsWith('y')) {
+    return word.substring(0, word.length - 1) + 'ies';
+  } else if (RegExp(r'(s|x|z|ch|sh)$').hasMatch(word)) {
+    return '${word}es';
   }
+  return '${word}s';
+}
 
-  return result;
+String lowerCamelCase(String input) {
+  return input[0].toLowerCase() + input.substring(1);
 }
 
 void main(List<String> arguments) {
   if (arguments.isEmpty) {
-    print("Por favor, ingresa el nombre del controlador.");
-    exit(1); // Salir con un código de error si no se ingresa el nombre
+    print("❌ Error: Debes ingresar el nombre del controlador.");
+    exit(1);
   }
 
-  String controllerName =
-      arguments[0]; // El nombre del modelo es el primer argumento
+  String controllerName = arguments[0];
+  String collectionName = camelCaseToSnakeCase(pluralize(controllerName));
+  String variableName = lowerCamelCase(controllerName);
 
-  // Crear el contenido del modelo basado en el nombre
-  String modelContent = '''import 'package:flutter/material.dart';
+  String controllerContent = '''
+import 'package:flutter/material.dart';
+import '../models/model.dart';
+import '../models/${camelCaseToSnakeCase(controllerName)}.dart';
 
-class $controllerName extends ChangeNotifier {
-  Future<void> index() async {
-  }
-  
-  Future<void> store(String data) async {
-    notifyListeners();
-  }
-
-  Future<void> update(String? id, String data) async {
-    if (id == null) {
-      throw ArgumentError("El ID no puede ser nulo");
+class ${controllerName}Controller extends ChangeNotifier {
+  Future<List<$controllerName>> index() async {
+    try {
+      return await Model.all<$controllerName>(
+        collectionName: '$collectionName',
+        fromJson: (id, data) => $controllerName(
+          id: id,
+          text: data['text'],
+          createdAt: data['created_at'],
+          updatedAt: data['updated_at'],
+        ),
+      );
+    } catch (e) {
+      debugPrint('🔴 Error al obtener datos: \$e');
+      return [];
     }
-    notifyListeners();
+  }
+
+  Future<void> store(String text) async {
+    if (text.trim().isEmpty) {
+      throw ArgumentError("El texto no puede estar vacío.");
+    }
+    try {
+      var new$controllerName = $controllerName(
+        text: text,
+      );
+      await new$controllerName.create();
+      notifyListeners();
+    } catch (e) {
+      debugPrint('🔴 Error al guardar: \$e');
+    }
+  }
+
+  Future<void> update(String? id, String newText) async {
+    if (id == null || newText.trim().isEmpty) {
+      throw ArgumentError("ID y texto son obligatorios.");
+    }
+    try {
+      var $variableName = await Model.find<$controllerName>(
+        collectionName: '$collectionName',
+        id: id,
+        fromJson: (id, data) => $controllerName(
+          id: id,
+          text: data['text'],
+        ),
+      );
+
+      if ($variableName != null) {
+        await $variableName.update({
+          'text': newText,
+        });
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('🔴 Error al actualizar: \$e');
+    }
   }
 
   Future<void> destroy(String? id) async {
     if (id == null) {
-      throw ArgumentError("El ID no puede ser nulo");
+      throw ArgumentError("El ID no puede ser nulo.");
     }
-    notifyListeners();
+    try {
+      var $variableName = await Model.find<$controllerName>(
+        collectionName: '$collectionName',
+        id: id,
+        fromJson: (id, data) => $controllerName(
+          id: id,
+          text: data['text'],
+        ),
+      );
+      await $variableName?.delete();
+      notifyListeners();
+    } catch (e) {
+      debugPrint('🔴 Error al eliminar: \$e');
+    }
   }
 }
 ''';
 
-  // Crear un archivo en el directorio lib/models (o en el lugar que prefieras)
   Directory('lib/controllers').createSync(recursive: true);
-  File('lib/controllers/${camelCaseToSnakeCase(controllerName)}.dart')
-      .writeAsStringSync(modelContent);
+  File('lib/controllers/${camelCaseToSnakeCase(controllerName)}_controller.dart')
+      .writeAsStringSync(controllerContent);
 
   print(
-      "Modelo creado: lib/controllers/${camelCaseToSnakeCase(controllerName)}.dart");
+      "✅ Controlador creado: lib/controllers/${camelCaseToSnakeCase(controllerName)}_controller.dart");
 }

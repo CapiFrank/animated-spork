@@ -54,6 +54,8 @@ dev_dependencies:
 scripts:
   make:model: "dart run lib/scripts/generate_model.dart"
   make:controller: "dart run lib/scripts/generate_controller.dart"
+  make:view: "dart run lib/scripts/generate_view.dart"
+  make:mvc: "dart run lib/scripts/generate.dart"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
