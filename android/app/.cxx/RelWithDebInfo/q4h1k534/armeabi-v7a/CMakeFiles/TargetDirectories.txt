@@ -1,0 +1,2 @@
+C:/Users/Jose/StudioProjects/animated-spork/android/app/.cxx/RelWithDebInfo/q4h1k534/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Jose/StudioProjects/animated-spork/android/app/.cxx/RelWithDebInfo/q4h1k534/armeabi-v7a/CMakeFiles/rebuild_cache.dir
