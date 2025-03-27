@@ -1,10 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:project_cipher/controllers/auth_controller.dart';
+import 'package:project_cipher/controllers/company_controller.dart';
+import 'package:project_cipher/controllers/costumer_controller.dart';
+import 'package:project_cipher/controllers/device_controller.dart';
+import 'package:project_cipher/views/company_view.dart';
+import 'package:project_cipher/views/costumer_view.dart';
+import 'package:project_cipher/views/device_view.dart';
+import 'package:project_cipher/views/login_view.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
-
-import 'models/model.dart';
-import 'models/user.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +19,17 @@ void main() async {
   );
   FirebaseFirestore.instance.settings =
       const Settings(cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AuthController()),
+        ChangeNotifierProvider(create: (context) => DeviceController()),
+        ChangeNotifierProvider(create: (context) => CostumerController()),
+        ChangeNotifierProvider(create: (context) => CompanyController()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -21,64 +37,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  String? userName;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (userName != null) // Mostrar solo si hay un nombre
-              Text(
-                'Usuario: $userName',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                var user = await Model.find<User>(
-                  collectionName: 'users',
-                  id: '6vj2eUCSEoRMS1a7WpOH',
-                  fromJson: (id, data) => User(
-                    id: id,
-                    name: data['name'],
-                    email: data['email'],
-                    password: data['password'],
-                  ),
-                );
-
-                if (user != null) {
-                  setState(() {
-                    userName = user.name; // Actualiza la pantalla con el nombre
-                  });
-                }
-              },
-              child: const Text('Obtener Usuario'),
-            ),
-          ],
-        ),
-      ),
+    return Consumer<AuthController>(
+      builder: (context, authController, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                  seedColor: Color.fromRGBO(42, 62, 40, 1))),
+          home: authController.isAuthenticated ? DeviceView() : LoginView(),
+          routes: {
+            '/users': (context) => CompanyView(),
+            '/products': (context) => CostumerView(),
+          },
+        );
+      },
     );
   }
 }

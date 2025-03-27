@@ -30,10 +30,11 @@ abstract class Model {
   /// **Actualiza un documento existente**
   Future<void> update(Map<String, dynamic> data) async {
     if (id == null) throw Exception("El registro no tiene un ID.");
+    Map<String, dynamic> toUpdate = Map.from(data)..remove('id');
     await _firestore
         .collection(collectionName)
         .doc(id)
-        .update({...data, 'updated_at': FieldValue.serverTimestamp()});
+        .update({...toUpdate, 'updated_at': FieldValue.serverTimestamp()});
     // Actualiza la instancia en memoria después de la actualización
     var updatedDoc = await _firestore.collection(collectionName).doc(id).get();
     if (updatedDoc.exists && updatedDoc.data() != null) {

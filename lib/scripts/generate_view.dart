@@ -27,7 +27,7 @@ void main(List<String> arguments) {
   String viewContent = '''
 import 'package:flutter/material.dart';
 import '../controllers/${snakeCaseName}_controller.dart';
-import '../models/${snakeCaseName}.dart';
+import '../models/$snakeCaseName.dart';
 
 class ${viewName}View extends StatefulWidget {
   const ${viewName}View({super.key});

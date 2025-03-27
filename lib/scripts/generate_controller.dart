@@ -8,7 +8,7 @@ String camelCaseToSnakeCase(String input) {
 
 String pluralize(String word) {
   if (word.endsWith('y')) {
-    return word.substring(0, word.length - 1) + 'ies';
+    return '${word.substring(0, word.length - 1)}ies';
   } else if (RegExp(r'(s|x|z|ch|sh)$').hasMatch(word)) {
     return '${word}es';
   }
@@ -31,7 +31,7 @@ void main(List<String> arguments) {
 
   String controllerContent = '''
 import 'package:flutter/material.dart';
-import '../models/model.dart';
+import '../utils/model.dart';
 import '../models/${camelCaseToSnakeCase(controllerName)}.dart';
 
 class ${controllerName}Controller extends ChangeNotifier {

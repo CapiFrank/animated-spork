@@ -31,7 +31,8 @@ void main(List<String> arguments) {
   String fileName = camelCaseToSnakeCase(modelName);
 
   // Crear el contenido del modelo basado en el nombre
-  String modelContent = '''import 'model.dart';
+  String modelContent = '''
+import '../utils/model.dart';
 
 class $modelName extends Model {
 String text;

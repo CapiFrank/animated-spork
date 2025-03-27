@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:bcrypt/bcrypt.dart';
 
@@ -6,6 +7,13 @@ class Hash {
   /// Genera un hash usando bcrypt (igual que Laravel)
   static String make(String value, {int rounds = 10}) {
     return BCrypt.hashpw(value, BCrypt.gensalt(logRounds: rounds));
+  }
+
+  static String token() {
+    final random = Random.secure();
+    final sessionIdBytes = List<int>.generate(16, (_) => random.nextInt(256));
+    String sessionId = String.fromCharCodes(sessionIdBytes);
+    return BCrypt.hashpw(sessionId, BCrypt.gensalt());
   }
 
   /// Verifica si una contraseña coincide con un hash
