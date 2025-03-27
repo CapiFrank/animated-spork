@@ -89,7 +89,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
     );
   }
 
-  // Método que maneja la acción al presionar una tecla
+  // Metodo que maneja la acción al presionar una tecla
   void _onKeyPressed(String key) {
     if (key == "←") {
       // Borrar el último carácter
