@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project_cipher/utils/circuit_breaker.dart';
 
 abstract class Model {
   String? id;
@@ -60,7 +61,8 @@ abstract class Model {
   /// **Elimina un registro**
   Future<void> delete() async {
     if (id == null) throw Exception("El registro no tiene un ID.");
-    await _firestore.collection(collectionName).doc(id).delete();
+    await CircuitBreaker.retry(
+        () => _firestore.collection(collectionName).doc(id).delete());
   }
 
   // Metodo para obtener un documento relacionado (con referencia a otro documento)
@@ -69,11 +71,11 @@ abstract class Model {
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
     try {
-      var querySnapshot = await _firestore
+      var querySnapshot = await CircuitBreaker.retry(() => _firestore
           .collection(collectionName)
           .doc(id)
           .collection(collection)
-          .get();
+          .get());
       return querySnapshot.docs
           .map((doc) => fromJson(doc.id, doc.data()))
           .toList();
@@ -89,10 +91,10 @@ abstract class Model {
       String? value = '',
       required T Function(String id, Map<String, dynamic>) fromJson}) async {
     try {
-      var querySnapshot = await _firestore
+      var querySnapshot = await CircuitBreaker.retry(() => _firestore
           .collection(collection)
           .where(field, isEqualTo: value)
-          .get();
+          .get());
       return querySnapshot.docs
           .map((doc) => fromJson(doc.id, doc.data()))
           .toList();
@@ -107,7 +109,8 @@ abstract class Model {
     required String id,
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
-    var doc = await _firestore.collection(collectionName).doc(id).get();
+    var doc = await CircuitBreaker.retry(
+        () => _firestore.collection(collectionName).doc(id).get());
     if (!doc.exists || doc.data() == null) {
       return null; // Evita error si `doc.data()` es null.
     }
@@ -119,7 +122,8 @@ abstract class Model {
     required String collectionName,
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
-    var querySnapshot = await _firestore.collection(collectionName).get();
+    var querySnapshot = await CircuitBreaker.retry(
+        () => _firestore.collection(collectionName).get());
     return querySnapshot.docs
         .map((doc) => fromJson(doc.id, doc.data()))
         .toList();
@@ -132,10 +136,10 @@ abstract class Model {
     required dynamic value,
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
-    var querySnapshot = await _firestore
+    var querySnapshot = await CircuitBreaker.retry(() => _firestore
         .collection(collectionName)
         .where(field, isEqualTo: value)
-        .get();
+        .get());
     return querySnapshot.docs
         .map((doc) => fromJson(doc.id, doc.data()))
         .toList();
@@ -148,11 +152,11 @@ abstract class Model {
     required dynamic value,
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
-    var querySnapshot = await _firestore
+    var querySnapshot = await CircuitBreaker.retry(() => _firestore
         .collection(collectionName)
         .where(field, isEqualTo: value)
         .limit(1)
-        .get();
+        .get());
     if (querySnapshot.docs.isEmpty) return null;
     var doc = querySnapshot.docs.first;
     return fromJson(doc.id, doc.data());
@@ -164,11 +168,11 @@ abstract class Model {
     required String field,
     required dynamic value,
   }) async {
-    var querySnapshot = await _firestore
+    var querySnapshot = await CircuitBreaker.retry(() => _firestore
         .collection(collectionName)
         .where(field, isEqualTo: value)
         .limit(1)
-        .get();
+        .get());
     return querySnapshot.docs.isNotEmpty;
   }
 
@@ -176,7 +180,8 @@ abstract class Model {
   static Future<int> count<T extends Model>({
     required String collectionName,
   }) async {
-    var querySnapshot = await _firestore.collection(collectionName).get();
+    var querySnapshot = await CircuitBreaker.retry(
+        () => _firestore.collection(collectionName).get());
     return querySnapshot.size;
   }
 
@@ -187,10 +192,10 @@ abstract class Model {
     bool descending = false,
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
-    var querySnapshot = await _firestore
+    var querySnapshot = await CircuitBreaker.retry(() => _firestore
         .collection(collectionName)
         .orderBy(field, descending: descending)
-        .get();
+        .get());
     return querySnapshot.docs
         .map((doc) => fromJson(doc.id, doc.data()))
         .toList();
@@ -202,8 +207,8 @@ abstract class Model {
     required int count,
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
-    var querySnapshot =
-        await _firestore.collection(collectionName).limit(count).get();
+    var querySnapshot = await CircuitBreaker.retry(
+        () => _firestore.collection(collectionName).limit(count).get());
     return querySnapshot.docs
         .map((doc) => fromJson(doc.id, doc.data()))
         .toList();

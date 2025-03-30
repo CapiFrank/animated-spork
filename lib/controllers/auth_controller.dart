@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:project_cipher/views/payment_blocked_view.dart';
 
 import '../models/device.dart';
 import '../utils/auth_service.dart';
+import '../views/device_view.dart';
 import '../views/login_view.dart';
 
 class AuthController extends ChangeNotifier {
@@ -16,7 +18,14 @@ class AuthController extends ChangeNotifier {
     await _authService.login(email, password);
     _device = _authService.currentDevice;
     notifyListeners();
-    return _device != null;
+
+    if (_device == null) return false;
+
+    if (!_device!.active) {
+      return false;
+    }
+
+    return true;
   }
 
   Future<void> logout(BuildContext context) async {
@@ -39,12 +48,30 @@ class AuthController extends ChangeNotifier {
     );
   }
 
-  Future<bool> checkSession() async {
+  Future<void> checkSession(BuildContext context) async {
     bool isValid = await _authService.checkSessionToken();
     if (isValid) {
       _device = _authService.currentDevice;
       notifyListeners();
+
+      if (_device!.active) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => DeviceView()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => PaymentBlockedView()),
+        );
+      }
+    } else {
+      _device = null;
+      notifyListeners();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginView()),
+      );
     }
-    return isValid;
   }
 }

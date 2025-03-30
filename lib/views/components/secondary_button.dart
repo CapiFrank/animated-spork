@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class PrimaryButton extends StatelessWidget {
-  const PrimaryButton(
+class SecondaryButton extends StatelessWidget {
+  const SecondaryButton(
       {super.key, required this.labelText, required this.onPressed});
   final String labelText;
   final Function() onPressed;
@@ -13,13 +13,14 @@ class PrimaryButton extends StatelessWidget {
         padding: EdgeInsets.all(15),
         margin: EdgeInsets.symmetric(horizontal: 45),
         decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary,
+            border: Border.all(
+                width: 2, color: Theme.of(context).colorScheme.secondary),
             borderRadius: BorderRadius.circular(8)),
         child: Center(
           child: Text(
             labelText,
             style: TextStyle(
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: Theme.of(context).colorScheme.secondary,
                 fontWeight: FontWeight.bold,
                 fontSize: 18),
           ),

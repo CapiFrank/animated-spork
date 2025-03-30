@@ -1,11 +1,12 @@
 import 'package:project_cipher/utils/hash.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:project_cipher/utils/secure_storage.dart';
+import 'package:project_cipher/utils/time_sync.dart';
 
 import '../models/device.dart';
 import 'model.dart';
 
 class AuthService {
-  final FlutterSecureStorage _storage = FlutterSecureStorage();
   Device? currentDevice;
 
   Future<void> login(String email, String password) async {
@@ -34,15 +35,15 @@ class AuthService {
         throw Exception("Dispositivo bloqueado por falta de pago.");
       }
 
-      String? localToken = await _storage.read(key: 'session_token');
+      String? localToken = await SecureStorage.getToken();
 
       if (localToken == null || localToken != device.token) {
-        String newToken = Hash.token();
+        String newToken = await Hash.secureToken(device.id!);
         device.token = newToken;
 
         await device.save();
 
-        await _storage.write(key: 'session_token', value: newToken);
+        await SecureStorage.saveToken(newToken);
       }
       currentDevice = device;
     } catch (e) {
@@ -51,7 +52,7 @@ class AuthService {
   }
 
   Future<void> logout() async {
-    await _storage.delete(key: 'session_token');
+    await SecureStorage.deleteToken();
     currentDevice?.token = '';
     await currentDevice?.save();
     currentDevice = null;
@@ -59,7 +60,7 @@ class AuthService {
 
   Future<bool> checkSessionToken() async {
     try {
-      String? token = await _storage.read(key: 'session_token');
+      String? token = await SecureStorage.getToken();
       if (token == null) return false;
       var devices = await Model.where<Device>(
           collectionName: 'devices',
@@ -79,7 +80,8 @@ class AuthService {
   }
 
   Future<void> checkAndUpdateExpiration(Device device) async {
-    if (device.expiresAt!.toDate().isBefore(DateTime.now())) {
+    await TimeValidator.syncWithServer();
+    if (TimeValidator.isExpired(device.expiresAt!)) {
       device.active = false;
       await device.save();
       throw Exception("Licencia expirada, dispositivo desactivado.");

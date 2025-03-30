@@ -3,6 +3,7 @@ import 'package:project_cipher/controllers/auth_controller.dart';
 import 'package:project_cipher/views/components/primary_button.dart';
 import 'package:project_cipher/views/device_view.dart';
 import 'package:project_cipher/views/components/input_text.dart';
+import 'package:project_cipher/views/payment_blocked_view.dart';
 import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
@@ -18,7 +19,6 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
-  final bgColor = Color.fromRGBO(202, 213, 226, 1);
 
   void _login() async {
     if (!_formKey.currentState!.validate()) return;
@@ -37,10 +37,17 @@ class _LoginViewState extends State<LoginView> {
       );
 
       if (success) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => DeviceView()),
-        );
+        if (authController.device!.active) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => DeviceView()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => PaymentBlockedView()),
+          );
+        }
       } else {
         setState(() => _errorMessage = "Credenciales inválidas.");
       }
@@ -97,8 +104,9 @@ class _LoginViewState extends State<LoginView> {
               if (_errorMessage != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
-                  child:
-                      Text(_errorMessage!, style: TextStyle(color: Colors.red)),
+                  child: Text(_errorMessage!,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.error)),
                 ),
               SizedBox(height: 40),
               _isLoading

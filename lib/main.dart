@@ -7,7 +7,9 @@ import 'package:project_cipher/controllers/device_controller.dart';
 import 'package:project_cipher/views/company_view.dart';
 import 'package:project_cipher/views/costumer_view.dart';
 import 'package:project_cipher/views/device_view.dart';
+import 'package:project_cipher/views/loading_view.dart';
 import 'package:project_cipher/views/login_view.dart';
+import 'package:project_cipher/views/payment_blocked_view.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,8 +34,21 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      Provider.of<AuthController>(context, listen: false).checkSession(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +57,16 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                  seedColor: Color.fromRGBO(42, 62, 40, 1))),
-          home: authController.isAuthenticated ? DeviceView() : LoginView(),
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Color.fromRGBO(42, 62, 40, 1),
+            ),
+          ),
+          home: LoadingView(),
+          // home: authController.isAuthenticated
+          //     ? (authController.device!.active
+          //         ? DeviceView()
+          //         : PaymentBlockedView())
+          //     : LoginView(),
           routes: {
             '/users': (context) => CompanyView(),
             '/products': (context) => CostumerView(),
