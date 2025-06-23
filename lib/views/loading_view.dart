@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:project_cipher/views/layouts/base_layout.dart';
 
 class LoadingView extends StatelessWidget {
   const LoadingView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
-      ),
+    return BaseLayout(
+      child: CircularProgressIndicator(),
     );
   }
 }

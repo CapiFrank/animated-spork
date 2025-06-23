@@ -6,10 +6,10 @@ class NumericKeyboard extends StatefulWidget {
   const NumericKeyboard({super.key, required this.onKeyPressed});
 
   @override
-  _NumericKeyboardState createState() => _NumericKeyboardState();
+  NumericKeyboardState createState() => NumericKeyboardState();
 }
 
-class _NumericKeyboardState extends State<NumericKeyboard> {
+class NumericKeyboardState extends State<NumericKeyboard> {
   final TextEditingController _controller =
       TextEditingController(); // Controlador para el input
 
@@ -30,61 +30,56 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
       "✓" // Aceptar
     ];
 
-    return Positioned(
-      right: 0, // Siempre alineado a la derecha
-      top: 0, // Pegado arriba
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.3, // Ajusta el ancho
-        height: MediaQuery.of(context).size.height,
-        color: Colors.grey,
-        child: Column(
-          children: [
-            // Campo de texto que muestra lo ingresado
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                controller: _controller,
-                keyboardType: TextInputType.none, // Deshabilitar teclado nativo
-                decoration: InputDecoration(
-                  labelText: "Ingrese un valor",
-                  labelStyle: TextStyle(color: Colors.white),
-                  filled: true,
-                  fillColor: Colors.black54,
-                ),
-                style: TextStyle(color: Colors.white),
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.3,
+      height: MediaQuery.of(context).size.height,
+      color: Colors.grey,
+      child: Column(
+        children: [
+          // Campo de texto
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextFormField(
+              controller: _controller,
+              keyboardType: TextInputType.none,
+              decoration: InputDecoration(
+                labelText: "Ingrese un valor",
+                labelStyle: TextStyle(color: Colors.white),
+                filled: true,
+                fillColor: Colors.black54,
               ),
+              style: TextStyle(color: Colors.white),
             ),
-            // Teclado numérico
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // 3 columnas
-                  childAspectRatio: 1.2,
-                ),
-                itemCount:
-                    keys.length, // Números del 0 al 9 + "Borrar" y "Enter"
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () => _onKeyPressed(keys[index]),
-                    child: Container(
-                      margin: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child: Text(
-                          keys[index],
-                          style: TextStyle(fontSize: 24, color: Colors.white),
-                        ),
+          ),
+          // Teclado numérico
+          Expanded(
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 1.2,
+              ),
+              itemCount: keys.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () => _onKeyPressed(keys[index]),
+                  child: Container(
+                    margin: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        keys[index],
+                        style: TextStyle(fontSize: 24, color: Colors.white),
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -17,13 +17,11 @@ String pluralize(String word) {
 
 void main(List<String> arguments) {
   if (arguments.isEmpty) {
-    print("❌ Error: Debes ingresar el nombre del modelo.");
     exit(1);
   }
 
   String modelName = arguments[0].trim();
   if (modelName.isEmpty || !RegExp(r'^[a-zA-Z]+$').hasMatch(modelName)) {
-    print("❌ Error: Nombre de modelo inválido. Usa solo letras.");
     exit(1);
   }
 
@@ -70,6 +68,4 @@ String text;
   // Crear un archivo en el directorio lib/models (o en el lugar que prefieras)
   Directory('lib/models').createSync(recursive: true);
   File('lib/models/$fileName.dart').writeAsStringSync(modelContent);
-
-  print("✅ Modelo creado exitosamente: lib/models/$fileName.dart");
 }

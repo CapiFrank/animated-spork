@@ -1,9 +1,9 @@
 import 'package:project_cipher/utils/hash.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:project_cipher/utils/secure_storage.dart';
 import 'package:project_cipher/utils/time_sync.dart';
 
 import '../models/device.dart';
+import 'error_handler.dart';
 import 'model.dart';
 
 class AuthService {
@@ -29,12 +29,6 @@ class AuthService {
       }
       Device device = foundDevices.first;
 
-      await checkAndUpdateExpiration(device);
-
-      if (!device.active) {
-        throw Exception("Dispositivo bloqueado por falta de pago.");
-      }
-
       String? localToken = await SecureStorage.getToken();
 
       if (localToken == null || localToken != device.token) {
@@ -45,9 +39,16 @@ class AuthService {
 
         await SecureStorage.saveToken(newToken);
       }
+
+      await checkAndUpdateExpiration(device);
+
       currentDevice = device;
+
+      if (!device.active) {
+        throw Exception("Dispositivo bloqueado por falta de pago.");
+      }
     } catch (e) {
-      print("❌ Error al iniciar sesión: $e");
+      ErrorHandler.handleError(e);
     }
   }
 
@@ -70,21 +71,23 @@ class AuthService {
       if (devices.isEmpty) return false;
       Device device = devices.first;
       await checkAndUpdateExpiration(device);
-      if (!device.active) return false;
       currentDevice = device;
       return true;
     } catch (e) {
-      print("❌ Error al iniciar sesión: $e");
+      ErrorHandler.handleError(e);
       return false;
     }
   }
 
   Future<void> checkAndUpdateExpiration(Device device) async {
-    await TimeValidator.syncWithServer();
+    try {
+      await TimeValidator.syncWithServer();
+    } catch (e) {
+      throw Exception("No se pudo verificar la expiración");
+    }
     if (TimeValidator.isExpired(device.expiresAt!)) {
       device.active = false;
       await device.save();
-      throw Exception("Licencia expirada, dispositivo desactivado.");
     }
   }
 }

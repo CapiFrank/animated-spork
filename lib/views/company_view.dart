@@ -6,10 +6,10 @@ class CompanyView extends StatefulWidget {
   const CompanyView({super.key});
 
   @override
-  _CompanyViewState createState() => _CompanyViewState();
+  CompanyViewState createState() => CompanyViewState();
 }
 
-class _CompanyViewState extends State<CompanyView> {
+class CompanyViewState extends State<CompanyView> {
   late Future<List<Company>> _data;
   final CompanyController _companyController = CompanyController();
 
@@ -31,7 +31,6 @@ class _CompanyViewState extends State<CompanyView> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            print("⚠️ Error: ${snapshot.error}");
             return Center(
                 child: Text(
                     'Error: ${snapshot.error?.toString() ?? "Desconocido"}'));

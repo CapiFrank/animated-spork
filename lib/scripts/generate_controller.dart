@@ -21,7 +21,6 @@ String lowerCamelCase(String input) {
 
 void main(List<String> arguments) {
   if (arguments.isEmpty) {
-    print("❌ Error: Debes ingresar el nombre del controlador.");
     exit(1);
   }
 
@@ -117,7 +116,4 @@ class ${controllerName}Controller extends ChangeNotifier {
   Directory('lib/controllers').createSync(recursive: true);
   File('lib/controllers/${camelCaseToSnakeCase(controllerName)}_controller.dart')
       .writeAsStringSync(controllerContent);
-
-  print(
-      "✅ Controlador creado: lib/controllers/${camelCaseToSnakeCase(controllerName)}_controller.dart");
 }

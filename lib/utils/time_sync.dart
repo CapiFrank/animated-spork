@@ -4,12 +4,14 @@ class TimeValidator {
   static Duration? _serverTimeOffset;
 
   static Future<void> syncWithServer() async {
-    final serverTimeDoc = await FirebaseFirestore.instance
-        .collection('metadata')
-        .doc('server_time')
-        .get();
-    final serverTime = serverTimeDoc['timestamp'].toDate();
-    _serverTimeOffset = serverTime.difference(DateTime.now());
+    final docRef =
+        FirebaseFirestore.instance.collection('metadata').doc('server_time');
+    await docRef.set(
+        {'timestamp': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+    final snapshot = await docRef.get();
+    final Timestamp serverTime = snapshot['timestamp'];
+    final DateTime serverDateTime = serverTime.toDate();
+    _serverTimeOffset = serverDateTime.difference(DateTime.now());
   }
 
   static bool isExpired(Timestamp expiresAt) {

@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:project_cipher/views/components/primary_button.dart';
 import 'package:project_cipher/views/components/secondary_button.dart';
+import 'package:project_cipher/views/layouts/base_layout.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/auth_controller.dart';
 import 'components/danger_button.dart';
-import 'device_view.dart';
 
 class PaymentBlockedView extends StatefulWidget {
   const PaymentBlockedView({super.key});
 
   @override
-  _PaymentBlockedState createState() => _PaymentBlockedState();
+  PaymentBlockedState createState() => PaymentBlockedState();
 }
 
-class _PaymentBlockedState extends State<PaymentBlockedView> {
+class PaymentBlockedState extends State<PaymentBlockedView> {
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -28,7 +27,7 @@ class _PaymentBlockedState extends State<PaymentBlockedView> {
     try {
       final authController =
           Provider.of<AuthController>(context, listen: false);
-      await authController.checkSession(context);
+      await authController.checkSession();
     } catch (e) {
       setState(() => _errorMessage = e.toString());
     } finally {
@@ -66,13 +65,13 @@ class _PaymentBlockedState extends State<PaymentBlockedView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BaseLayout(
       backgroundColor: Theme.of(context).colorScheme.onError,
       appBar: AppBar(
         title: Text("Cuenta Bloqueada"),
         backgroundColor: Theme.of(context).colorScheme.onError,
       ),
-      body: Padding(
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

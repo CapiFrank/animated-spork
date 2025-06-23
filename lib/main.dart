@@ -2,17 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:project_cipher/controllers/auth_controller.dart';
 import 'package:project_cipher/controllers/company_controller.dart';
-import 'package:project_cipher/controllers/costumer_controller.dart';
+import 'package:project_cipher/controllers/customer_controller.dart';
 import 'package:project_cipher/controllers/device_controller.dart';
-import 'package:project_cipher/views/company_view.dart';
-import 'package:project_cipher/views/costumer_view.dart';
-import 'package:project_cipher/views/device_view.dart';
-import 'package:project_cipher/views/loading_view.dart';
-import 'package:project_cipher/views/login_view.dart';
-import 'package:project_cipher/views/payment_blocked_view.dart';
+import 'package:project_cipher/router.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,9 +22,10 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => AuthController()),
+        ChangeNotifierProvider(
+            create: (context) => AuthController()..checkSession()),
         ChangeNotifierProvider(create: (context) => DeviceController()),
-        ChangeNotifierProvider(create: (context) => CostumerController()),
+        ChangeNotifierProvider(create: (context) => CustomerController()),
         ChangeNotifierProvider(create: (context) => CompanyController()),
       ],
       child: MyApp(),
@@ -34,45 +33,20 @@ void main() async {
   );
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      Provider.of<AuthController>(context, listen: false).checkSession(context);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Consumer<AuthController>(
-      builder: (context, authController, child) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: Color.fromRGBO(42, 62, 40, 1),
-            ),
-          ),
-          home: LoadingView(),
-          // home: authController.isAuthenticated
-          //     ? (authController.device!.active
-          //         ? DeviceView()
-          //         : PaymentBlockedView())
-          //     : LoginView(),
-          routes: {
-            '/users': (context) => CompanyView(),
-            '/products': (context) => CostumerView(),
-          },
-        );
-      },
+    return MaterialApp.router(
+      scaffoldMessengerKey: scaffoldMessengerKey,
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color.fromRGBO(42, 62, 40, 1),
+        ),
+      ),
+      routerConfig: appRouter(context), // Se usa GoRouter
     );
   }
 }

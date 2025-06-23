@@ -145,6 +145,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  curved_navigation_bar:
+    dependency: "direct main"
+    description:
+      name: curved_navigation_bar
+      sha256: bb4ab128fcb6f4a9f0f1f72d227db531818b20218984789777f049fcbf919279
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.6"
+  dropdown_search:
+    dependency: "direct main"
+    description:
+      name: dropdown_search
+      sha256: c29b3e5147a82a06a4a08b3b574c51cb48cc17ad89893d53ee72a6f86643622e
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.2"
   fake_async:
     dependency: transitive
     description:
@@ -262,6 +278,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  flutter_slidable:
+    dependency: "direct main"
+    description:
+      name: flutter_slidable
+      sha256: ab7dbb16f783307c9d7762ede2593ce32c220ba2ba0fd540a3db8e9a3acba71a
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
+  flutter_svg:
+    dependency: "direct main"
+    description:
+      name: flutter_svg
+      sha256: cd57f7969b4679317c17af6fd16ee233c1e60a82ed209d8a475c54fd6fd6f845
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -272,6 +304,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  go_router:
+    dependency: "direct main"
+    description:
+      name: go_router
+      sha256: f02fd7d2a4dc512fec615529824fdd217fecb3a3d3de68360293a551f21634b3
+      url: "https://pub.dev"
+    source: hosted
+    version: "14.8.1"
   html:
     dependency: transitive
     description:
@@ -280,6 +320,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.15.5"
+  http:
+    dependency: transitive
+    description:
+      name: http
+      sha256: "2c11f3f94c687ee9bad77c171151672986360b2b001d109814ee7140b2cf261b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.0"
+  http_parser:
+    dependency: transitive
+    description:
+      name: http_parser
+      sha256: "178d74305e7866013777bab2c3d8726205dc5a4dd935297175b19a23a2e66571"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.2"
   image:
     dependency: transitive
     description:
@@ -336,6 +392,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.1"
+  logging:
+    dependency: transitive
+    description:
+      name: logging
+      sha256: c8245ada5f1717ed44271ed1c26b8ce85ca3228fd2ffdb75468ab01979309d61
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.0"
   matcher:
     dependency: transitive
     description:
@@ -376,6 +440,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
+  path_parsing:
+    dependency: transitive
+    description:
+      name: path_parsing
+      sha256: "883402936929eac138ee0a45da5b0f2c80f89913e6dc3bf77eb65b84b409c6ca"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   path_provider:
     dependency: transitive
     description:
@@ -597,6 +669,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.4"
+  vector_graphics:
+    dependency: transitive
+    description:
+      name: vector_graphics
+      sha256: a4f059dc26fc8295b5921376600a194c4ec7d55e72f2fe4c7d2831e103d461e6
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.19"
+  vector_graphics_codec:
+    dependency: transitive
+    description:
+      name: vector_graphics_codec
+      sha256: "99fd9fbd34d9f9a32efd7b6a6aae14125d8237b10403b422a6a6dfeac2806146"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.13"
+  vector_graphics_compiler:
+    dependency: transitive
+    description:
+      name: vector_graphics_compiler
+      sha256: "557a315b7d2a6dbb0aaaff84d857967ce6bdc96a63dc6ee2a57ce5a6ee5d3331"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.17"
   vector_math:
     dependency: transitive
     description:

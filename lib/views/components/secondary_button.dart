@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_cipher/utils/palette.dart';
 
 class SecondaryButton extends StatelessWidget {
   const SecondaryButton(
@@ -13,14 +14,17 @@ class SecondaryButton extends StatelessWidget {
         padding: EdgeInsets.all(15),
         margin: EdgeInsets.symmetric(horizontal: 45),
         decoration: BoxDecoration(
-            border: Border.all(
-                width: 2, color: Theme.of(context).colorScheme.secondary),
-            borderRadius: BorderRadius.circular(8)),
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(0),
+          border: Border.all(
+            color: Palette(context).onPrimary,
+          ),
+        ),
         child: Center(
           child: Text(
             labelText,
             style: TextStyle(
-                color: Theme.of(context).colorScheme.secondary,
+                color: Palette(context).onPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 18),
           ),

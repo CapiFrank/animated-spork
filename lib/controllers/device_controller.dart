@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:project_cipher/utils/error_handler.dart';
 import '../utils/model.dart';
 import '../models/device.dart';
 
@@ -11,7 +12,7 @@ class DeviceController extends ChangeNotifier {
         fromJson: Device.fromDoc,
       );
     } catch (e) {
-      debugPrint('🔴 Error al obtener datos: $e');
+      ErrorHandler.handleError(e);
       return [];
     }
   }
@@ -46,7 +47,7 @@ class DeviceController extends ChangeNotifier {
       await newDevice.create();
       notifyListeners();
     } catch (e) {
-      debugPrint('🔴 Error al guardar: $e');
+      ErrorHandler.handleError(e);
     }
   }
 
@@ -68,7 +69,7 @@ class DeviceController extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('🔴 Error al actualizar: $e');
+      ErrorHandler.handleError(e);
     }
   }
 
@@ -85,7 +86,7 @@ class DeviceController extends ChangeNotifier {
       await device?.delete();
       notifyListeners();
     } catch (e) {
-      debugPrint('🔴 Error al eliminar: $e');
+      ErrorHandler.handleError(e);
     }
   }
 }

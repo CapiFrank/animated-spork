@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_cipher/utils/palette.dart';
 
 class InputText extends StatelessWidget {
   const InputText(
@@ -24,19 +25,19 @@ class InputText extends StatelessWidget {
       obscureText: obscureText,
       decoration: InputDecoration(
           focusedErrorBorder: OutlineInputBorder(
-              borderSide:
-                  BorderSide(color: Theme.of(context).colorScheme.error)),
+              borderRadius: BorderRadius.circular(0.0),
+              borderSide: BorderSide(color: Palette(context).error)),
           errorBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.errorContainer)),
+              borderRadius: BorderRadius.circular(0.0),
+              borderSide: BorderSide(color: Palette(context).errorContainer)),
           labelText: labelText,
           enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.outlineVariant)),
+              borderRadius: BorderRadius.circular(0.0),
+              borderSide: BorderSide(color: Palette(context).outlineVariant)),
           focusedBorder: OutlineInputBorder(
-              borderSide:
-                  BorderSide(color: Theme.of(context).colorScheme.outline)),
-          fillColor: Theme.of(context).colorScheme.onPrimary,
+              borderRadius: BorderRadius.circular(0.0),
+              borderSide: BorderSide(color: Palette(context).outline)),
+          fillColor: Palette(context).onPrimary,
           filled: true),
       validator: validator,
     );

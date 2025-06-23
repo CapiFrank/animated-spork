@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_cipher/utils/palette.dart';
 
 class DangerButton extends StatelessWidget {
   const DangerButton(
@@ -13,13 +14,13 @@ class DangerButton extends StatelessWidget {
         padding: EdgeInsets.all(15),
         margin: EdgeInsets.symmetric(horizontal: 45),
         decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.error,
+            color: Palette(context).error,
             borderRadius: BorderRadius.circular(8)),
         child: Center(
           child: Text(
             labelText,
             style: TextStyle(
-                color: Theme.of(context).colorScheme.onError,
+                color: Palette(context).onError,
                 fontWeight: FontWeight.bold,
                 fontSize: 18),
           ),

@@ -15,7 +15,6 @@ String lowerCamelCase(String input) {
 
 void main(List<String> arguments) {
   if (arguments.isEmpty) {
-    print("❌ Por favor, ingresa el nombre de la vista.");
     exit(1);
   }
 
@@ -82,6 +81,4 @@ class _${viewName}ViewState extends State<${viewName}View> {
   // Crear el archivo en lib/views
   Directory('lib/views').createSync(recursive: true);
   File('lib/views/${snakeCaseName}_view.dart').writeAsStringSync(viewContent);
-
-  print("✅ Vista creada: lib/views/${snakeCaseName}_view.dart");
 }
