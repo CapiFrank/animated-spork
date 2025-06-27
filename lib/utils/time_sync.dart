@@ -1,17 +1,44 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class TimeValidator {
   static Duration? _serverTimeOffset;
 
+  static Future<bool> hasInternetConnection() async {
+    final result = await Connectivity().checkConnectivity();
+    return result != ConnectivityResult.none;
+  }
+
   static Future<void> syncWithServer() async {
     final docRef =
         FirebaseFirestore.instance.collection('metadata').doc('server_time');
-    await docRef.set(
-        {'timestamp': FieldValue.serverTimestamp()}, SetOptions(merge: true));
-    final snapshot = await docRef.get();
-    final Timestamp serverTime = snapshot['timestamp'];
-    final DateTime serverDateTime = serverTime.toDate();
-    _serverTimeOffset = serverDateTime.difference(DateTime.now());
+
+    final useCache = !(await hasInternetConnection());
+    final options = useCache
+        ? const GetOptions(source: Source.cache)
+        : const GetOptions(source: Source.serverAndCache);
+
+    // Intenta actualizar el timestamp si hay conexión
+    if (!useCache) {
+      try {
+        await docRef.set(
+          {'timestamp': FieldValue.serverTimestamp()},
+          SetOptions(merge: true),
+        );
+      } catch (_) {
+        // Ignorar errores de red al hacer set
+      }
+    }
+
+    try {
+      final snapshot = await docRef.get(options);
+      final Timestamp serverTime = snapshot['timestamp'];
+      final DateTime serverDateTime = serverTime.toDate();
+      _serverTimeOffset = serverDateTime.difference(DateTime.now());
+    } catch (e) {
+      print('Error al obtener el tiempo del servidor o caché: $e');
+      _serverTimeOffset = null;
+    }
   }
 
   static bool isExpired(Timestamp expiresAt) {

@@ -1,5 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:project_cipher/utils/circuit_breaker.dart';
+
+Future<bool> hasInternetConnection() async {
+  final result = await Connectivity().checkConnectivity();
+  return result != ConnectivityResult.none;
+}
 
 abstract class Model {
   String? id;
@@ -71,11 +77,15 @@ abstract class Model {
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
     try {
+      final useCache = !(await hasInternetConnection());
+      final options = useCache
+          ? const GetOptions(source: Source.cache)
+          : const GetOptions(source: Source.serverAndCache);
       var querySnapshot = await CircuitBreaker.retry(() => _firestore
           .collection(collectionName)
           .doc(id)
           .collection(collection)
-          .get());
+          .get(options));
       return querySnapshot.docs
           .map((doc) => fromJson(doc.id, doc.data()))
           .toList();
@@ -91,10 +101,14 @@ abstract class Model {
       String? value = '',
       required T Function(String id, Map<String, dynamic>) fromJson}) async {
     try {
+      final useCache = !(await hasInternetConnection());
+      final options = useCache
+          ? const GetOptions(source: Source.cache)
+          : const GetOptions(source: Source.serverAndCache);
       var querySnapshot = await CircuitBreaker.retry(() => _firestore
           .collection(collection)
           .where(field, isEqualTo: value)
-          .get());
+          .get(options));
       return querySnapshot.docs
           .map((doc) => fromJson(doc.id, doc.data()))
           .toList();
@@ -109,8 +123,12 @@ abstract class Model {
     required String id,
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
+    final useCache = !(await hasInternetConnection());
+      final options = useCache
+          ? const GetOptions(source: Source.cache)
+          : const GetOptions(source: Source.serverAndCache);
     var doc = await CircuitBreaker.retry(
-        () => _firestore.collection(collectionName).doc(id).get());
+        () => _firestore.collection(collectionName).doc(id).get(options));
     if (!doc.exists || doc.data() == null) {
       return null; // Evita error si `doc.data()` es null.
     }
@@ -122,8 +140,12 @@ abstract class Model {
     required String collectionName,
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
+    final useCache = !(await hasInternetConnection());
+      final options = useCache
+          ? const GetOptions(source: Source.cache)
+          : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(
-        () => _firestore.collection(collectionName).get());
+        () => _firestore.collection(collectionName).get(options));
     return querySnapshot.docs
         .map((doc) => fromJson(doc.id, doc.data()))
         .toList();
@@ -136,10 +158,14 @@ abstract class Model {
     required dynamic value,
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
+    final useCache = !(await hasInternetConnection());
+      final options = useCache
+          ? const GetOptions(source: Source.cache)
+          : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(() => _firestore
         .collection(collectionName)
         .where(field, isEqualTo: value)
-        .get());
+        .get(options));
     return querySnapshot.docs
         .map((doc) => fromJson(doc.id, doc.data()))
         .toList();
@@ -152,11 +178,15 @@ abstract class Model {
     required dynamic value,
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
+    final useCache = !(await hasInternetConnection());
+      final options = useCache
+          ? const GetOptions(source: Source.cache)
+          : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(() => _firestore
         .collection(collectionName)
         .where(field, isEqualTo: value)
         .limit(1)
-        .get());
+        .get(options));
     if (querySnapshot.docs.isEmpty) return null;
     var doc = querySnapshot.docs.first;
     return fromJson(doc.id, doc.data());
@@ -168,11 +198,15 @@ abstract class Model {
     required String field,
     required dynamic value,
   }) async {
+    final useCache = !(await hasInternetConnection());
+      final options = useCache
+          ? const GetOptions(source: Source.cache)
+          : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(() => _firestore
         .collection(collectionName)
         .where(field, isEqualTo: value)
         .limit(1)
-        .get());
+        .get(options));
     return querySnapshot.docs.isNotEmpty;
   }
 
@@ -180,8 +214,12 @@ abstract class Model {
   static Future<int> count<T extends Model>({
     required String collectionName,
   }) async {
+    final useCache = !(await hasInternetConnection());
+      final options = useCache
+          ? const GetOptions(source: Source.cache)
+          : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(
-        () => _firestore.collection(collectionName).get());
+        () => _firestore.collection(collectionName).get(options));
     return querySnapshot.size;
   }
 
@@ -192,10 +230,14 @@ abstract class Model {
     bool descending = false,
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
+    final useCache = !(await hasInternetConnection());
+      final options = useCache
+          ? const GetOptions(source: Source.cache)
+          : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(() => _firestore
         .collection(collectionName)
         .orderBy(field, descending: descending)
-        .get());
+        .get(options));
     return querySnapshot.docs
         .map((doc) => fromJson(doc.id, doc.data()))
         .toList();
@@ -207,8 +249,12 @@ abstract class Model {
     required int count,
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
+    final useCache = !(await hasInternetConnection());
+      final options = useCache
+          ? const GetOptions(source: Source.cache)
+          : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(
-        () => _firestore.collection(collectionName).limit(count).get());
+        () => _firestore.collection(collectionName).limit(count).get(options));
     return querySnapshot.docs
         .map((doc) => fromJson(doc.id, doc.data()))
         .toList();

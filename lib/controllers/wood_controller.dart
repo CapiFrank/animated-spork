@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:project_cipher/models/company.dart';
 import '../utils/model.dart';
-import '../models/customer.dart';
+import '../models/wood.dart';
 
-class CustomerController extends ChangeNotifier {
-  Future<List<Customer>> index(String companyId) async {
+class WoodController extends ChangeNotifier {
+  Future<List<Wood>> index(String companyId) async {
     try {
       Company? company = await Model.find<Company>(
         collectionName: 'companies',
@@ -14,7 +14,7 @@ class CustomerController extends ChangeNotifier {
       if (company == null) {
         throw ArgumentError("Empresa no encontrada.");
       }
-      return await company.costumers().getAll();
+      return await company.woods().getAll();
     } catch (e) {
       debugPrint('🔴 Error al obtener datos: $e');
       return [];
@@ -24,7 +24,8 @@ class CustomerController extends ChangeNotifier {
   Future<void> store(
       {required String companyId,
       required String name,
-      required String phoneNumber}) async {
+      required double pricePerInch,
+      required double discount}) async {
     try {
       Company? company = await Model.find<Company>(
         collectionName: 'companies',
@@ -34,9 +35,10 @@ class CustomerController extends ChangeNotifier {
       if (company == null) {
         throw ArgumentError("Empresa no encontrada.");
       }
-      await company.costumers().create({
+      await company.woods().create({
         'name': name,
-        'phone': phoneNumber,
+        'price_per_inch': pricePerInch,
+        'discount': discount,
       });
       notifyListeners();
     } catch (e) {
@@ -44,23 +46,27 @@ class CustomerController extends ChangeNotifier {
     }
   }
 
-  Future<void> update(String? id, String newText) async {
-    if (id == null || newText.trim().isEmpty) {
-      throw ArgumentError("ID y texto son obligatorios.");
-    }
+  Future<void> update(
+      {required String companyId,
+      required String id,
+      required String name,
+      required double pricePerInch,
+      required double discount}) async {
     try {
-      var costumer = await Model.find<Customer>(
-        collectionName: 'costumers',
-        id: id,
-        fromJson: Customer.fromDoc,
+      Company? company = await Model.find<Company>(
+        collectionName: 'companies',
+        id: companyId,
+        fromJson: Company.fromDoc,
       );
-
-      if (costumer != null) {
-        await costumer.update({
-          'text': newText,
-        });
-        notifyListeners();
+      if (company == null) {
+        throw ArgumentError("Empresa no encontrada.");
       }
+      await company.woods().update(id, {
+        'name': name,
+        'price_per_inch': pricePerInch,
+        'discount': discount,
+      });
+      notifyListeners();
     } catch (e) {
       debugPrint('🔴 Error al actualizar: $e');
     }
@@ -76,7 +82,7 @@ class CustomerController extends ChangeNotifier {
       if (company == null) {
         throw ArgumentError("Empresa no encontrada.");
       }
-      await company.costumers().delete(id);
+      await company.woods().delete(id);
       notifyListeners();
     } catch (e) {
       debugPrint('🔴 Error al eliminar: $e');

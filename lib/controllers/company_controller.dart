@@ -7,12 +7,7 @@ class CompanyController extends ChangeNotifier {
     try {
       return await Model.all<Company>(
         collectionName: 'companies',
-        fromJson: (id, data) => Company(
-          id: id,
-          name: data['name'],
-          createdAt: data['created_at'],
-          updatedAt: data['updated_at'],
-        ),
+        fromJson: Company.fromDoc,
       );
     } catch (e) {
       debugPrint('🔴 Error al obtener datos: $e');
@@ -20,13 +15,30 @@ class CompanyController extends ChangeNotifier {
     }
   }
 
-  Future<void> store(String text) async {
-    if (text.trim().isEmpty) {
-      throw ArgumentError("El texto no puede estar vacío.");
+  Future<void> store({
+    required String name,
+    required String customerId,
+    required String email,
+    required String fiscalName,
+    required String nif,
+    required String password,
+    required String phoneNumber,
+  }) async {
+    if (name.trim().isEmpty ||
+        email.trim().isEmpty ||
+        password.trim().isEmpty) {
+      throw ArgumentError(
+          "Los campos nombre, email y contraseña no pueden estar vacíos.");
     }
     try {
       var newCompany = Company(
-        name: text,
+        name: name,
+        customerId: customerId,
+        email: email,
+        fiscalName: fiscalName,
+        nif: nif,
+        password: password,
+        phoneNumber: phoneNumber,
       );
       await newCompany.create();
       notifyListeners();
@@ -35,23 +47,38 @@ class CompanyController extends ChangeNotifier {
     }
   }
 
-  Future<void> update(String? id, String newText) async {
-    if (id == null || newText.trim().isEmpty) {
-      throw ArgumentError("ID y texto son obligatorios.");
+  Future<void> update({
+    required String id,
+    required String name,
+    required String customerId,
+    required String email,
+    required String fiscalName,
+    required String nif,
+    required String password,
+    required String phoneNumber,
+  }) async {
+    if (id.trim().isEmpty ||
+        name.trim().isEmpty ||
+        email.trim().isEmpty ||
+        password.trim().isEmpty) {
+      throw ArgumentError("ID, nombre, email y contraseña son obligatorios.");
     }
     try {
       var company = await Model.find<Company>(
         collectionName: 'companies',
         id: id,
-        fromJson: (id, data) => Company(
-          id: id,
-          name: data['name'],
-        ),
+        fromJson: Company.fromDoc,
       );
 
       if (company != null) {
         await company.update({
-          'name': newText,
+          'name': name,
+          'customer_id': customerId,
+          'email': email,
+          'fiscal_name': fiscalName,
+          'nif': nif,
+          'password': password,
+          'phone_number': phoneNumber,
         });
         notifyListeners();
       }
@@ -68,10 +95,7 @@ class CompanyController extends ChangeNotifier {
       var company = await Model.find<Company>(
         collectionName: 'companies',
         id: id,
-        fromJson: (id, data) => Company(
-          id: id,
-          name: data['name'],
-        ),
+        fromJson: Company.fromDoc,
       );
       await company?.delete();
       notifyListeners();

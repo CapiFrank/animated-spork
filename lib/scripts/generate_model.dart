@@ -60,6 +60,14 @@ String text;
         updatedAt: json['updated_at']);
   }
 
+  static $modelName fromDoc(id, data) {
+    return $modelName(
+        id: id,
+        text: data['text'],
+        createdAt: data['created_at'],
+        updatedAt: data['updated_at']);
+  }
+
   @override
   String get collectionName => "$collectionName";
 }

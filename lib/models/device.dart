@@ -28,7 +28,6 @@ class Device extends Model {
   @override
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'name': name,
       'email': email,
       'password': password,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:project_cipher/utils/palette.dart';
 
 class InputText extends StatelessWidget {
@@ -8,6 +9,9 @@ class InputText extends StatelessWidget {
       required this.validator,
       this.keyboardType = TextInputType.text,
       required this.labelText,
+      this.decoration,
+      this.style,
+      this.inputFormatters = const [],
       this.obscureText = false})
       : _textEditingController = textEditingController;
 
@@ -16,30 +20,45 @@ class InputText extends StatelessWidget {
   final TextInputType? keyboardType;
   final String labelText;
   final bool obscureText;
+  final InputDecoration? decoration;
+  final TextStyle? style;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      inputFormatters: inputFormatters,
+      style: style,
       controller: _textEditingController,
       keyboardType: keyboardType,
       obscureText: obscureText,
-      decoration: InputDecoration(
-          focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(0.0),
-              borderSide: BorderSide(color: Palette(context).error)),
-          errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(0.0),
-              borderSide: BorderSide(color: Palette(context).errorContainer)),
-          labelText: labelText,
-          enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(0.0),
-              borderSide: BorderSide(color: Palette(context).outlineVariant)),
-          focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(0.0),
-              borderSide: BorderSide(color: Palette(context).outline)),
-          fillColor: Palette(context).onPrimary,
-          filled: true),
+      decoration: decoration?.copyWith(labelText: labelText) ??
+          defaultDecoration(context, labelText),
       validator: validator,
     );
   }
+}
+
+InputDecoration defaultDecoration(BuildContext context, String labelText) {
+  return InputDecoration(
+    labelText: labelText,
+    filled: true,
+    fillColor: Palette(context).onPrimary,
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(0.0),
+      borderSide: BorderSide(color: Palette(context).outlineVariant),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(0.0),
+      borderSide: BorderSide(color: Palette(context).outline),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(0.0),
+      borderSide: BorderSide(color: Palette(context).errorContainer),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(0.0),
+      borderSide: BorderSide(color: Palette(context).error),
+    ),
+  );
 }

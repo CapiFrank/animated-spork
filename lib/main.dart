@@ -17,15 +17,14 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseFirestore.instance.settings =
-      const Settings(cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
+  FirebaseFirestore.instance.settings = const Settings(
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED, persistenceEnabled: true);
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
             create: (context) => AuthController()..checkSession()),
         ChangeNotifierProvider(create: (context) => DeviceController()),
-        ChangeNotifierProvider(create: (context) => CustomerController()),
         ChangeNotifierProvider(create: (context) => CompanyController()),
       ],
       child: MyApp(),
