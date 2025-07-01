@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:project_cipher/controllers/auth_controller.dart';
+import 'package:project_cipher/utils/auth_global.dart';
 import 'package:project_cipher/utils/palette.dart';
 import 'package:project_cipher/utils/saw_pos_icons.dart';
 import 'package:project_cipher/views/customer_view.dart';
@@ -10,11 +11,9 @@ import 'package:project_cipher/views/login_view.dart';
 import 'package:project_cipher/views/payment_blocked_view.dart';
 import 'package:project_cipher/views/wood_plank_view.dart';
 import 'package:project_cipher/views/wood_view.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
-GoRouter appRouter(BuildContext context) {
-  final authController = Provider.of<AuthController>(context);
+GoRouter appRouter(AuthController authController) {
   return GoRouter(
     initialLocation: '/device',
     routes: [
@@ -100,7 +99,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
         context.go('/customer');
         break;
       case 4:
-        context.go('/device');
+        authController.logout();
         break;
     }
   }

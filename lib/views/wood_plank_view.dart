@@ -71,6 +71,7 @@ class WoodPlankViewState extends State<WoodPlankView> {
                   children: [
                     Expanded(
                       child: InputText(
+                        cursorColor: Palette(context).onPrimary,
                         style: TextStyle(color: Palette(context).onPrimary),
                         keyboardType: TextInputType.numberWithOptions(
                             decimal: true, signed: false),
@@ -90,6 +91,7 @@ class WoodPlankViewState extends State<WoodPlankView> {
                     ),
                     Expanded(
                       child: InputText(
+                        cursorColor: Palette(context).onPrimary,
                         style: TextStyle(color: Palette(context).onPrimary),
                         keyboardType: TextInputType.numberWithOptions(
                             decimal: true, signed: false),
@@ -114,6 +116,7 @@ class WoodPlankViewState extends State<WoodPlankView> {
                   children: [
                     Expanded(
                       child: InputText(
+                        cursorColor: Palette(context).onPrimary,
                         keyboardType: TextInputType.numberWithOptions(
                             decimal: true, signed: false),
                         style: TextStyle(color: Palette(context).onPrimary),
@@ -133,6 +136,7 @@ class WoodPlankViewState extends State<WoodPlankView> {
                     ),
                     Expanded(
                       child: InputText(
+                        cursorColor: Palette(context).onPrimary,
                         style: TextStyle(color: Palette(context).onPrimary),
                         keyboardType: TextInputType.numberWithOptions(
                             decimal: true, signed: true),

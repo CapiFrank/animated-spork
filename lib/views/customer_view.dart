@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:project_cipher/controllers/auth_controller.dart';
 import 'package:project_cipher/utils/error_handler.dart';
@@ -7,6 +8,7 @@ import 'package:project_cipher/views/components/input_text.dart';
 import 'package:project_cipher/views/components/secondary_button.dart';
 import 'package:project_cipher/views/components/slidable_button.dart';
 import 'package:project_cipher/views/layouts/scroll_layout.dart';
+import 'package:project_cipher/views/partials/edit_customer_view.dart';
 import 'package:provider/provider.dart';
 import '../controllers/customer_controller.dart';
 import '../models/customer.dart';
@@ -20,20 +22,17 @@ class CustomerView extends StatefulWidget {
 
 class CustomerViewState extends State<CustomerView> {
   late Future<List<Customer>> _data;
-  final CustomerController _costumerController = CustomerController();
+  final CustomerController _customerController = CustomerController();
 
   late TextEditingController nameController;
   late TextEditingController phoneController;
-  late String companyId;
 
   @override
   void initState() {
     super.initState();
     nameController = TextEditingController();
     phoneController = TextEditingController();
-    final authController = Provider.of<AuthController>(context, listen: false);
-    companyId = authController.device!.companyId;
-    _data = _costumerController.index(companyId);
+    _data = _customerController.index();
   }
 
   @override
@@ -76,6 +75,7 @@ class CustomerViewState extends State<CustomerView> {
                   height: 15,
                 ),
                 InputText(
+                  cursorColor: Palette(context).onPrimary,
                   style: TextStyle(color: Palette(context).onPrimary),
                   decoration: customDecoration(context),
                   textEditingController: nameController,
@@ -89,8 +89,15 @@ class CustomerViewState extends State<CustomerView> {
                 ),
                 const SizedBox(height: 15),
                 InputText(
+                  cursorColor: Palette(context).onPrimary,
                   style: TextStyle(color: Palette(context).onPrimary),
                   decoration: customDecoration(context),
+                  keyboardType: TextInputType.numberWithOptions(
+                      decimal: true, signed: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter
+                        .digitsOnly, // Solo acepta dígitos 0-9
+                  ],
                   textEditingController: phoneController,
                   labelText: "Número de teléfono",
                   validator: (value) {
@@ -112,18 +119,14 @@ class CustomerViewState extends State<CustomerView> {
                             'Por favor, completa todos los campos.');
                         return;
                       }
-                      _costumerController
+                      _customerController
                           .store(
-                              name: nameController.text,
-                              phoneNumber: phoneController.text,
-                              companyId: companyId)
+                        name: nameController.text,
+                        phoneNumber: phoneController.text,
+                      )
                           .then((_) {
                         setState(() {
-                          _data = _costumerController.index(
-                              Provider.of<AuthController>(context,
-                                      listen: false)
-                                  .device!
-                                  .companyId);
+                          _data = _customerController.index();
                           nameController.clear();
                           phoneController.clear();
                         });
@@ -147,7 +150,21 @@ class CustomerViewState extends State<CustomerView> {
                           motion: const DrawerMotion(),
                           children: [
                             SlidableButton(
-                              onPressed: () => debugPrint("Editar"),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  backgroundColor: Palette(context).surface,
+                                  context: context,
+                                  isScrollControlled: true,
+                                  builder: (context) => EditCustomerModal(
+                                    customer: customer,
+                                    onSuccess: () {
+                                      setState(() {
+                                        _data = _customerController.index();
+                                      });
+                                    },
+                                  ),
+                                );
+                              },
                               icon: Icons.edit,
                               label: 'Editar',
                               color: Colors.green,
@@ -158,16 +175,11 @@ class CustomerViewState extends State<CustomerView> {
                           motion: const DrawerMotion(),
                           children: [
                             SlidableButton(
-                              onPressed: () => _costumerController
-                                  .destroy(
-                                      id: customer.id!, companyId: companyId)
+                              onPressed: () => _customerController
+                                  .destroy(id: customer.id!)
                                   .then((_) {
                                 setState(() {
-                                  _data = _costumerController.index(
-                                      Provider.of<AuthController>(context,
-                                              listen: false)
-                                          .device!
-                                          .companyId);
+                                  _data = _customerController.index();
                                 });
                               }).catchError((error) {
                                 ErrorHandler.handleError(

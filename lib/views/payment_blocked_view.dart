@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:project_cipher/utils/auth_global.dart';
 import 'package:project_cipher/views/components/secondary_button.dart';
 import 'package:project_cipher/views/layouts/base_layout.dart';
 import 'package:provider/provider.dart';
@@ -25,8 +26,6 @@ class PaymentBlockedState extends State<PaymentBlockedView> {
       _errorMessage = null;
     });
     try {
-      final authController =
-          Provider.of<AuthController>(context, listen: false);
       await authController.checkSession();
     } catch (e) {
       setState(() => _errorMessage = e.toString());

@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:project_cipher/controllers/auth_controller.dart';
 import 'package:project_cipher/controllers/company_controller.dart';
-import 'package:project_cipher/controllers/customer_controller.dart';
 import 'package:project_cipher/controllers/device_controller.dart';
 import 'package:project_cipher/router.dart';
+import 'package:project_cipher/utils/auth_global.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +23,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (context) => AuthController()..checkSession()),
+            create: (context) => auth()..checkSession()),
         ChangeNotifierProvider(create: (context) => DeviceController()),
         ChangeNotifierProvider(create: (context) => CompanyController()),
       ],
@@ -37,15 +37,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      scaffoldMessengerKey: scaffoldMessengerKey,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Color.fromRGBO(42, 62, 40, 1),
-        ),
-      ),
-      routerConfig: appRouter(context), // Se usa GoRouter
+    return Consumer<AuthController>(
+      builder: (context, authController, _) {
+        return MaterialApp.router(
+          scaffoldMessengerKey: scaffoldMessengerKey,
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color.fromRGBO(42, 62, 40, 1),
+            ),
+          ),
+          routerConfig: appRouter(auth()), // Pasa el authController
+        );
+      },
     );
   }
 }
+

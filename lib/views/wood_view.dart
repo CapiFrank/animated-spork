@@ -28,8 +28,7 @@ class WoodViewState extends State<WoodView> {
   @override
   void initState() {
     super.initState();
-    final authController = Provider.of<AuthController>(context, listen: false);
-    _data = _woodController.index(authController.device!.companyId);
+    _data = _woodController.index();
   }
 
   @override
@@ -68,6 +67,7 @@ class WoodViewState extends State<WoodView> {
                     height: 15,
                   ),
                   InputText(
+                    cursorColor: Palette(context).onPrimary,
                     style: TextStyle(color: Palette(context).onPrimary),
                     decoration: customDecoration(context),
                     textEditingController: _nameController,
@@ -81,6 +81,7 @@ class WoodViewState extends State<WoodView> {
                   ),
                   const SizedBox(height: 15),
                   InputText(
+                    cursorColor: Palette(context).onPrimary,
                     style: TextStyle(color: Palette(context).onPrimary),
                     decoration: customDecoration(context),
                     keyboardType: TextInputType.numberWithOptions(
@@ -98,6 +99,7 @@ class WoodViewState extends State<WoodView> {
                     height: 15,
                   ),
                   InputText(
+                    cursorColor: Palette(context).onPrimary,
                     style: TextStyle(color: Palette(context).onPrimary),
                     decoration: customDecoration(context),
                     keyboardType: TextInputType.numberWithOptions(
@@ -126,22 +128,16 @@ class WoodViewState extends State<WoodView> {
                         }
                         _woodController
                             .store(
-                                name: _nameController.text,
-                                pricePerInch:
-                                    double.parse(_priceController.text),
-                                discount:
-                                    double.parse(_discountController.text),
-                                companyId: Provider.of<AuthController>(context,
-                                        listen: false)
-                                    .device!
-                                    .companyId)
+                          name: _nameController.text,
+                          pricePerInch: double.parse(_priceController.text),
+                          discount: double.parse(_discountController.text),
+                        )
                             .then((_) {
                           setState(() {
-                            _data = _woodController.index(
-                                Provider.of<AuthController>(context,
-                                        listen: false)
-                                    .device!
-                                    .companyId);
+                            _data = _woodController.index();
+                            _nameController.clear();
+                            _priceController.clear();
+                            _discountController.clear();
                           });
                         });
                       }),
@@ -172,7 +168,16 @@ class WoodViewState extends State<WoodView> {
                           motion: const DrawerMotion(),
                           children: [
                             SlidableButton(
-                              onPressed: () => debugPrint("Eliminar"),
+                              onPressed: () => _woodController
+                                  .destroy(id: wood.id!)
+                                  .then((_) {
+                                setState(() {
+                                  _data = _woodController.index();
+                                });
+                              }).catchError((error) {
+                                ErrorHandler.handleError(
+                                    'Error al eliminar el cliente: $error');
+                              }),
                               icon: Icons.delete,
                               label: 'Eliminar',
                               color: Colors.red,

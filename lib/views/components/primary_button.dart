@@ -12,7 +12,7 @@ class PrimaryButton extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         padding: EdgeInsets.all(15),
-        margin: EdgeInsets.symmetric(horizontal: 45),
+        margin: EdgeInsets.symmetric(horizontal: 0),
         decoration: BoxDecoration(
             color: Palette(context).primary,
             borderRadius: BorderRadius.circular(0),

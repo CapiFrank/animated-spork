@@ -13,8 +13,8 @@ import 'package:project_cipher/views/components/dropdown_search.dart';
 import 'package:project_cipher/views/components/secondary_button.dart';
 import 'package:project_cipher/views/components/slidable_button.dart';
 import 'package:project_cipher/views/layouts/scroll_layout.dart';
+import 'package:project_cipher/views/partials/edit_sawed_view.dart';
 import 'package:provider/provider.dart';
-import '../models/device.dart';
 
 class SawedView extends StatefulWidget {
   const SawedView({super.key});
@@ -30,21 +30,22 @@ class SawedViewState extends State<SawedView> {
   final SawedController _sawedController = SawedController();
   final CustomerController _customerController = CustomerController();
   final WoodController _woodController = WoodController();
+  final ValueNotifier<Customer?> selectedCustomerNotifier = ValueNotifier(null);
+  final ValueNotifier<Wood?> selectedWoodNotifier = ValueNotifier(null);
 
   @override
   void initState() {
     super.initState();
-    final authController = Provider.of<AuthController>(context, listen: false);
-    _data = _sawedController.index(authController.device!.companyId);
-    _customerData = _customerController.index(authController.device!.companyId);
-    _woodData = _woodController.index(authController.device!.companyId);
+    _data = _sawedController.index();
+    _customerData = _customerController.index();
+    _woodData = _woodController.index();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: FutureBuilder<List<Sawed>>(
-      future: _data,
+        body: FutureBuilder<List<dynamic>>(
+      future: Future.wait([_data, _customerData, _woodData]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -56,8 +57,11 @@ class SawedViewState extends State<SawedView> {
           return const Center(
               child: Text('Ocurrió un error al cargar los dispositivos.'));
         } else {
+          final sawedList = snapshot.data![0] as List<Sawed>;
+          final customerList = snapshot.data![1] as List<Customer>;
+          final woodList = snapshot.data![2] as List<Wood>;
           return ScrollLayout(
-            isEmpty: (snapshot.hasData && snapshot.data!.isEmpty),
+            isEmpty: sawedList.isEmpty,
             showEmptyMessage: true,
             headerChild: Column(
               children: [
@@ -74,21 +78,19 @@ class SawedViewState extends State<SawedView> {
                 ),
 
                 /// Dropdown de clientes
-                FutureBuilder<List<Customer>>(
-                  future: _customerData,
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const CircularProgressIndicator();
-                    }
+                ValueListenableBuilder<Customer?>(
+                  valueListenable: selectedCustomerNotifier,
+                  builder: (context, selected, _) {
                     return DropdownSearch<Customer>(
                       context: context,
                       label: "Selecciona un cliente",
-                      items: (filter, lp) => snapshot.data!,
-                      selectedItem: snapshot.data!.first,
+                      items: (filter, lp) => customerList,
+                      selectedItem: selected,
                       itemAsString: (customer) => customer.name,
                       compareFn: (a, b) => a.id == b.id,
-                      onChanged: (customer) =>
-                          debugPrint("Cliente seleccionado: ${customer?.name}"),
+                      onChanged: (customer) {
+                        selectedCustomerNotifier.value = customer;
+                      },
                     );
                   },
                 ),
@@ -96,34 +98,74 @@ class SawedViewState extends State<SawedView> {
                 const SizedBox(height: 15),
 
                 /// Dropdown de maderas
-                FutureBuilder<List<Wood>>(
-                  future: _woodData,
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const CircularProgressIndicator();
-                    }
+                ValueListenableBuilder<Wood?>(
+                  valueListenable: selectedWoodNotifier,
+                  builder: (context, selected, _) {
                     return DropdownSearch<Wood>(
                       context: context,
                       label: "Selecciona una madera",
-                      items: (filter, lp) => snapshot.data!,
-                      selectedItem: snapshot.data!.first,
+                      items: (filter, lp) => woodList,
+                      selectedItem: selected,
                       itemAsString: (wood) => wood.name,
                       compareFn: (a, b) => a.id == b.id,
-                      onChanged: (wood) =>
-                          debugPrint("Madera seleccionada: ${wood?.name}"),
+                      onChanged: (wood) {
+                        selectedWoodNotifier.value = wood;
+                      },
                     );
                   },
                 ),
                 SizedBox(
                   height: 15,
                 ),
-                SecondaryButton(labelText: "Agregar", onPressed: () {}),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 45),
+                  child: SecondaryButton(
+                    labelText: "Agregar",
+                    onPressed: () async {
+                      if (selectedCustomerNotifier.value == null ||
+                          selectedWoodNotifier.value == null) {
+                        ErrorHandler.handleError(
+                            'Seleccioná cliente y tipo de madera');
+                        return;
+                      }
+                      try {
+                        await _sawedController.store(
+                          customerId: selectedCustomerNotifier.value!.id!,
+                          woodId: selectedWoodNotifier.value!.id!,
+                        );
+                        selectedCustomerNotifier.value = null;
+                        selectedWoodNotifier.value = null;
+                        // Clear selections after adding
+                        setState(() {
+                          _data = _sawedController.index();
+                        });
+                      } catch (error) {
+                        ErrorHandler.handleError(
+                            'Error al agregar el aserrado: $error');
+                      }
+                    },
+                  ),
+                ),
               ],
             ),
             bodyChild: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  final device = snapshot.data![index];
+                  final device = sawedList[index];
+
+                  final customerName = customerList
+                      .firstWhere((c) => c.id == device.customerId,
+                          orElse: () =>
+                              Customer(name: 'Desconocido', phoneNumber: ''))
+                      .name;
+
+                  final woodName = woodList
+                      .firstWhere((w) => w.id == device.woodId,
+                          orElse: () => Wood(
+                              name: 'Desconocida',
+                              pricePerInch: 0,
+                              discount: 0))
+                      .name;
                   return Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 4),
@@ -133,7 +175,23 @@ class SawedViewState extends State<SawedView> {
                           motion: const DrawerMotion(),
                           children: [
                             SlidableButton(
-                              onPressed: () => debugPrint("Editar"),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  backgroundColor: Palette(context).surface,
+                                  context: context,
+                                  isScrollControlled: true,
+                                  builder: (context) => EditSawedModal(
+                                    sawed: device,
+                                    customerList: customerList,
+                                    woodList: woodList,
+                                    onSuccess: () {
+                                      setState(() {
+                                        _data = _sawedController.index();
+                                      });
+                                    },
+                                  ),
+                                );
+                              },
                               icon: Icons.edit,
                               label: 'Editar',
                               color: Colors.green,
@@ -144,7 +202,18 @@ class SawedViewState extends State<SawedView> {
                           motion: const DrawerMotion(),
                           children: [
                             SlidableButton(
-                              onPressed: () => debugPrint("Eliminar"),
+                              onPressed: () => _sawedController
+                                  .destroy(
+                                id: device.id!,
+                              )
+                                  .then((_) {
+                                setState(() {
+                                  _data = _sawedController.index();
+                                });
+                              }).catchError((error) {
+                                ErrorHandler.handleError(
+                                    'Error al eliminar el aserrado: $error');
+                              }),
                               icon: Icons.delete,
                               label: 'Eliminar',
                               color: Colors.red,
@@ -157,13 +226,13 @@ class SawedViewState extends State<SawedView> {
                             borderRadius: BorderRadius.circular(0),
                           ),
                           child: ListTile(
-                            title: Text(device.customerId),
-                            subtitle: Text('ID: ${device.id}'),
+                            title: Text(customerName),
+                            subtitle: Text(woodName),
                           ),
                         ),
                       ));
                 },
-                childCount: snapshot.data!.length,
+                childCount: sawedList.length,
               ),
             ),
           );

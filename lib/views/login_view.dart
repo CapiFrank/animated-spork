@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_cipher/controllers/auth_controller.dart';
+import 'package:project_cipher/utils/auth_global.dart';
 import 'package:project_cipher/views/components/primary_button.dart';
 import 'package:project_cipher/views/components/input_text.dart';
 import 'package:project_cipher/views/layouts/base_layout.dart';
@@ -22,7 +23,6 @@ class LoginViewState extends State<LoginView> {
   void _login() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final authController = Provider.of<AuthController>(context, listen: false);
     await authController.login(
       _emailController.text.trim(),
       _passwordController.text,
@@ -87,8 +87,11 @@ class LoginViewState extends State<LoginView> {
                 SizedBox(height: 40),
                 _isLoading
                     ? CircularProgressIndicator()
-                    : PrimaryButton(
-                        labelText: "Iniciar Sesión", onPressed: _login),
+                    : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: PrimaryButton(
+                          labelText: "Iniciar Sesión", onPressed: _login),
+                    ),
               ],
             ),
           ),

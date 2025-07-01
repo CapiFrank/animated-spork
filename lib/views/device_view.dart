@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:project_cipher/controllers/auth_controller.dart';
+import 'package:project_cipher/utils/auth_global.dart';
 import 'package:project_cipher/utils/error_handler.dart';
 import 'package:project_cipher/utils/palette.dart';
 import 'package:project_cipher/views/components/dropdown_search.dart';
@@ -42,7 +43,7 @@ class DeviceViewState extends State<DeviceView> {
   // }
 
   void _logout() async {
-    await Provider.of<AuthController>(context, listen: false).logout();
+    await authController.logout();
   }
 
   void _loadDevices() {

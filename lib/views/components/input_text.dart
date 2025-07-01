@@ -12,7 +12,8 @@ class InputText extends StatelessWidget {
       this.decoration,
       this.style,
       this.inputFormatters = const [],
-      this.obscureText = false})
+      this.obscureText = false,
+      this.cursorColor})
       : _textEditingController = textEditingController;
 
   final TextEditingController _textEditingController;
@@ -23,6 +24,7 @@ class InputText extends StatelessWidget {
   final InputDecoration? decoration;
   final TextStyle? style;
   final List<TextInputFormatter>? inputFormatters;
+  final Color? cursorColor;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,7 @@ class InputText extends StatelessWidget {
       controller: _textEditingController,
       keyboardType: keyboardType,
       obscureText: obscureText,
+      cursorColor: cursorColor,
       decoration: decoration?.copyWith(labelText: labelText) ??
           defaultDecoration(context, labelText),
       validator: validator,

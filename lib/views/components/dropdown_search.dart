@@ -11,6 +11,8 @@ class DropdownSearch<T> extends StatelessWidget {
   final String label;
   final BuildContext context;
   final bool isEnabled;
+  final InputDecoration? decoration;
+  final Color? color;
 
   const DropdownSearch({
     super.key,
@@ -21,6 +23,8 @@ class DropdownSearch<T> extends StatelessWidget {
     required this.onChanged,
     required this.label,
     required this.context,
+    this.decoration,
+    this.color,
     this.isEnabled = true,
   });
 
@@ -54,34 +58,39 @@ class DropdownSearch<T> extends StatelessWidget {
         onChanged: onChanged,
         decoratorProps: ds.DropDownDecoratorProps(
           baseStyle: TextStyle(
-            color: Palette(context).onSecondary,
+            color: color ?? Palette(context).onSecondary,
             fontSize: 16,
           ),
-          decoration: InputDecoration(
-            labelText: label,
-            labelStyle: TextStyle(color: Palette(context).onSecondary),
-            suffixIconColor: Palette(context).onSecondary,
-            fillColor: Palette(context).secondary,
-            filled: true,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(0.0),
-              borderSide: BorderSide(color: Palette(context).outlineVariant),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(0.0),
-              borderSide: BorderSide(color: Palette(context).outline),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(0.0),
-              borderSide: BorderSide(color: Palette(context).errorContainer),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(0.0),
-              borderSide: BorderSide(color: Palette(context).error),
-            ),
-          ),
+          decoration: decoration?.copyWith(labelText: label) ??
+              defaultDecoration(context, label),
         ),
       ),
     );
   }
+}
+
+InputDecoration defaultDecoration(BuildContext context, String labelText) {
+  return InputDecoration(
+    labelText: labelText,
+    labelStyle: TextStyle(color: Palette(context).onSecondary),
+    suffixIconColor: Palette(context).onSecondary,
+    fillColor: Palette(context).secondary,
+    filled: true,
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(0.0),
+      borderSide: BorderSide(color: Palette(context).outlineVariant),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(0.0),
+      borderSide: BorderSide(color: Palette(context).outline),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(0.0),
+      borderSide: BorderSide(color: Palette(context).errorContainer),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(0.0),
+      borderSide: BorderSide(color: Palette(context).error),
+    ),
+  );
 }
