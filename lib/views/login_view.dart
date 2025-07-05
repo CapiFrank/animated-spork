@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:project_cipher/controllers/auth_controller.dart';
 import 'package:project_cipher/utils/auth_global.dart';
 import 'package:project_cipher/views/components/primary_button.dart';
 import 'package:project_cipher/views/components/input_text.dart';
 import 'package:project_cipher/views/layouts/base_layout.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginView extends StatefulWidget {

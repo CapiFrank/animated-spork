@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:project_cipher/controllers/auth_controller.dart';
-import 'package:project_cipher/utils/auth_global.dart';
 import 'package:project_cipher/utils/error_handler.dart';
 import 'package:project_cipher/utils/palette.dart';
 import 'package:project_cipher/views/components/dropdown_search.dart';
-import 'package:project_cipher/views/components/input_text.dart';
-import 'package:project_cipher/views/components/primary_button.dart';
 import 'package:project_cipher/views/components/secondary_button.dart';
 import 'package:project_cipher/views/components/slidable_button.dart';
 import 'package:project_cipher/views/layouts/scroll_layout.dart';
-import 'package:provider/provider.dart';
 import '../controllers/device_controller.dart';
 import '../models/device.dart';
 
@@ -24,7 +19,6 @@ class DeviceView extends StatefulWidget {
 class DeviceViewState extends State<DeviceView> {
   late Future<List<Device>> _data;
   final DeviceController _deviceController = DeviceController();
-  final TextEditingController _emailController = TextEditingController();
 
   @override
   void initState() {
@@ -42,9 +36,9 @@ class DeviceViewState extends State<DeviceView> {
   //   }
   // }
 
-  void _logout() async {
-    await authController.logout();
-  }
+  // void _logout() async {
+  //   await authController.logout();
+  // }
 
   void _loadDevices() {
     setState(() {

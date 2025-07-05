@@ -5,7 +5,7 @@
 
 
     <application
-        android:label="project_cipher"
+        android:label="SawPos"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

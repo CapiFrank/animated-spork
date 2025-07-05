@@ -11,4 +11,5 @@ class SawPos {
   static const IconData woodPlank = IconData(0xe802, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData woodLog = IconData(0xe803, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData customer = IconData(0xe804, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData woodBeam = IconData(0xe805, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

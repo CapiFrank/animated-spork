@@ -24,6 +24,9 @@ class DeviceController extends ChangeNotifier {
       String customerId,
       String companyId,
       String token,
+      String info,
+      String version,
+      bool useInternationalSystem,
       bool active,
       Timestamp expiresAt,
       Timestamp createdAt,
@@ -43,6 +46,9 @@ class DeviceController extends ChangeNotifier {
         expiresAt: expiresAt,
         createdAt: createdAt,
         updatedAt: updatedAt,
+        info: info,
+        version: version,
+        useInternationalSystem: useInternationalSystem,
       );
       await newDevice.create();
       notifyListeners();

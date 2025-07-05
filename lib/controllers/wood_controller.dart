@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:project_cipher/models/company.dart';
 import 'package:project_cipher/utils/auth_global.dart';
-import 'package:project_cipher/utils/model.dart';
 import 'package:project_cipher/models/wood.dart';
 
 class WoodController extends ChangeNotifier {
   Future<List<Wood>> index() async {
     try {
-      final companyId = auth().device?.companyId;
-      if (companyId == null) throw Exception("No hay empresa activa.");
+      await auth().loadCompany();
 
-      Company? company = await Model.find<Company>(
-        collectionName: 'companies',
-        id: companyId,
-        fromJson: Company.fromDoc,
-      );
-
+      final company = auth().company;
       if (company == null) throw ArgumentError("Empresa no encontrada.");
 
       return await company.woods().getAll();
@@ -27,24 +19,18 @@ class WoodController extends ChangeNotifier {
 
   Future<void> store({
     required String name,
-    required double pricePerInch,
+    required double pricePerUnit,
     required double discount,
   }) async {
     try {
-      final companyId = auth().device?.companyId;
-      if (companyId == null) throw Exception("No hay empresa activa.");
+      await auth().loadCompany();
 
-      Company? company = await Model.find<Company>(
-        collectionName: 'companies',
-        id: companyId,
-        fromJson: Company.fromDoc,
-      );
-
+      final company = auth().company;
       if (company == null) throw ArgumentError("Empresa no encontrada.");
 
       await company.woods().create({
         'name': name,
-        'price_per_inch': pricePerInch,
+        'price_per_unit': pricePerUnit,
         'discount': discount,
       });
 
@@ -57,24 +43,18 @@ class WoodController extends ChangeNotifier {
   Future<void> update({
     required String id,
     required String name,
-    required double pricePerInch,
+    required double pricePerUnit,
     required double discount,
   }) async {
     try {
-      final companyId = auth().device?.companyId;
-      if (companyId == null) throw Exception("No hay empresa activa.");
+      await auth().loadCompany();
 
-      Company? company = await Model.find<Company>(
-        collectionName: 'companies',
-        id: companyId,
-        fromJson: Company.fromDoc,
-      );
-
+      final company = auth().company;
       if (company == null) throw ArgumentError("Empresa no encontrada.");
 
       await company.woods().update(id, {
         'name': name,
-        'price_per_inch': pricePerInch,
+        'price_per_unit': pricePerUnit,
         'discount': discount,
       });
 
@@ -86,15 +66,9 @@ class WoodController extends ChangeNotifier {
 
   Future<void> destroy({required String id}) async {
     try {
-      final companyId = auth().device?.companyId;
-      if (companyId == null) throw Exception("No hay empresa activa.");
+      await auth().loadCompany();
 
-      Company? company = await Model.find<Company>(
-        collectionName: 'companies',
-        id: companyId,
-        fromJson: Company.fromDoc,
-      );
-
+      final company = auth().company;
       if (company == null) throw ArgumentError("Empresa no encontrada.");
 
       await company.woods().delete(id);

@@ -5,6 +5,7 @@ import 'package:project_cipher/utils/time_sync.dart';
 import '../models/device.dart';
 import 'error_handler.dart';
 import 'model.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class AuthService {
   Device? currentDevice;
@@ -39,7 +40,11 @@ class AuthService {
 
         await SecureStorage.saveToken(newToken);
       }
-
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      device.version = androidInfo.version.release;
+      device.info = androidInfo.name;
+      device.save();
       await checkAndUpdateExpiration(device);
 
       currentDevice = device;

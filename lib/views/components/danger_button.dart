@@ -12,10 +12,8 @@ class DangerButton extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         padding: EdgeInsets.all(15),
-        margin: EdgeInsets.symmetric(horizontal: 45),
         decoration: BoxDecoration(
-            color: Palette(context).error,
-            borderRadius: BorderRadius.circular(8)),
+            color: Palette(context).error, borderRadius: BorderRadius.zero),
         child: Center(
           child: Text(
             labelText,

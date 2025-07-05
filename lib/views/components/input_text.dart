@@ -12,7 +12,9 @@ class InputText extends StatelessWidget {
       this.decoration,
       this.style,
       this.inputFormatters = const [],
+      this.textInputAction = TextInputAction.done,
       this.obscureText = false,
+      this.onFieldSubmitted,
       this.cursorColor})
       : _textEditingController = textEditingController;
 
@@ -25,11 +27,15 @@ class InputText extends StatelessWidget {
   final TextStyle? style;
   final List<TextInputFormatter>? inputFormatters;
   final Color? cursorColor;
+  final TextInputAction textInputAction;
+  final Function(String)? onFieldSubmitted;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      textInputAction: textInputAction,
       inputFormatters: inputFormatters,
+      onFieldSubmitted: onFieldSubmitted,
       style: style,
       controller: _textEditingController,
       keyboardType: keyboardType,

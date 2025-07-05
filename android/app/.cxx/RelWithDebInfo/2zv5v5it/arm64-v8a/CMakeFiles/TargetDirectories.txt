@@ -1,0 +1,2 @@
+C:/Users/Jose/StudioProjects/animated-spork/android/app/.cxx/RelWithDebInfo/2zv5v5it/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/Jose/StudioProjects/animated-spork/android/app/.cxx/RelWithDebInfo/2zv5v5it/arm64-v8a/CMakeFiles/rebuild_cache.dir

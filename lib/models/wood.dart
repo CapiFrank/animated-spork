@@ -1,14 +1,16 @@
+import 'package:project_cipher/utils/price_calculator.dart';
+
 import '../utils/model.dart';
 
 class Wood extends Model {
   String name;
-  double pricePerInch;
+  double pricePerUnit;
   double discount;
 
   Wood({
     super.id,
     required this.name,
-    required this.pricePerInch,
+    required this.pricePerUnit,
     required this.discount,
     super.createdAt,
     super.updatedAt,
@@ -19,7 +21,7 @@ class Wood extends Model {
     return {
       'id': id,
       'name': name,
-      'price_per_inch': pricePerInch,
+      'price_per_unit': pricePerUnit,
       'discount': discount,
       'created_at': createdAt,
       'updated_at': updatedAt,
@@ -31,7 +33,7 @@ class Wood extends Model {
     return Wood(
       id: json['id'],
       name: json['name'],
-      pricePerInch: (json['price_per_inch'] ?? 0).toDouble(),
+      pricePerUnit: (json['price_per_unit'] ?? 0).toDouble(),
       discount: (json['discount'] ?? 0).toDouble(),
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
@@ -42,11 +44,14 @@ class Wood extends Model {
     return Wood(
         id: id,
         name: data['name'],
-        pricePerInch: (data['price_per_inch'] ?? 0).toDouble(),
+        pricePerUnit: (data['price_per_unit'] ?? 0).toDouble(),
         discount: (data['discount'] ?? 0).toDouble(),
         createdAt: data['created_at'],
         updatedAt: data['updated_at']);
   }
+
+  double price({required double volume}) =>
+      PriceCalculator.price(volume: volume, price: pricePerUnit);
 
   @override
   String get collectionName => "woods";

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.8.0" type="baseline" client="gradle" dependencies="false" name="AGP (8.8.0)" variant="all" version="8.8.0">
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="This folder configuration (`v21`) is unnecessary; `minSdkVersion` is 29. Merge all the resources in this folder into `drawable`.">
+        <location
+            file="src/main/res/drawable-v21"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="This folder configuration (`v26`) is unnecessary; `minSdkVersion` is 29. Merge all the resources in this folder into `mipmap-anydpi`.">
+        <location
+            file="src/main/res/mipmap-anydpi-v26"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-hdpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-mdpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-xhdpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-xxhdpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-xxxhdpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `android12branding.png` icon has identical contents in the following configuration folders: drawable-hdpi-v31, drawable-night-hdpi-v31">
+        <location
+            file="src/main/res/drawable-night-hdpi-v31/android12branding.png"/>
+        <location
+            file="src/main/res/drawable-hdpi-v31/android12branding.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `android12branding.png` icon has identical contents in the following configuration folders: drawable-mdpi-v31, drawable-night-mdpi-v31">
+        <location
+            file="src/main/res/drawable-night-mdpi-v31/android12branding.png"/>
+        <location
+            file="src/main/res/drawable-mdpi-v31/android12branding.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `android12branding.png` icon has identical contents in the following configuration folders: drawable-night-xhdpi-v31, drawable-xhdpi-v31">
+        <location
+            file="src/main/res/drawable-xhdpi-v31/android12branding.png"/>
+        <location
+            file="src/main/res/drawable-night-xhdpi-v31/android12branding.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `android12branding.png` icon has identical contents in the following configuration folders: drawable-night-xxhdpi-v31, drawable-xxhdpi-v31">
+        <location
+            file="src/main/res/drawable-xxhdpi-v31/android12branding.png"/>
+        <location
+            file="src/main/res/drawable-night-xxhdpi-v31/android12branding.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `android12branding.png` icon has identical contents in the following configuration folders: drawable-night-xxxhdpi-v31, drawable-xxxhdpi-v31">
+        <location
+            file="src/main/res/drawable-xxxhdpi-v31/android12branding.png"/>
+        <location
+            file="src/main/res/drawable-night-xxxhdpi-v31/android12branding.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `android12splash.png` icon has identical contents in the following configuration folders: drawable-hdpi, drawable-night-hdpi">
+        <location
+            file="src/main/res/drawable-night-hdpi/android12splash.png"/>
+        <location
+            file="src/main/res/drawable-hdpi/android12splash.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `android12splash.png` icon has identical contents in the following configuration folders: drawable-mdpi, drawable-night-mdpi">
+        <location
+            file="src/main/res/drawable-night-mdpi/android12splash.png"/>
+        <location
+            file="src/main/res/drawable-mdpi/android12splash.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `android12splash.png` icon has identical contents in the following configuration folders: drawable-night-xhdpi, drawable-xhdpi">
+        <location
+            file="src/main/res/drawable-xhdpi/android12splash.png"/>
+        <location
+            file="src/main/res/drawable-night-xhdpi/android12splash.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `android12splash.png` icon has identical contents in the following configuration folders: drawable-night-xxhdpi, drawable-xxhdpi">
+        <location
+            file="src/main/res/drawable-xxhdpi/android12splash.png"/>
+        <location
+            file="src/main/res/drawable-night-xxhdpi/android12splash.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `android12splash.png` icon has identical contents in the following configuration folders: drawable-night-xxxhdpi, drawable-xxxhdpi">
+        <location
+            file="src/main/res/drawable-xxxhdpi/android12splash.png"/>
+        <location
+            file="src/main/res/drawable-night-xxxhdpi/android12splash.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `background.png` icon has identical contents in the following configuration folders: drawable-v21, drawable">
+        <location
+            file="src/main/res/drawable/background.png"/>
+        <location
+            file="src/main/res/drawable-v21/background.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/background.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/background.png"/>
+    </issue>
+
+</issues>

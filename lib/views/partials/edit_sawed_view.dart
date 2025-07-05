@@ -35,10 +35,14 @@ class _EditSawedModalState extends State<EditSawedModal> {
   @override
   void initState() {
     super.initState();
-    selectedCustomerNotifier.value =
-        widget.customerList.firstWhere((c) => c.id == widget.sawed.customerId);
-    selectedWoodNotifier.value =
-        widget.woodList.firstWhere((w) => w.id == widget.sawed.woodId);
+    selectedCustomerNotifier.value = widget.customerList.firstWhere(
+      (c) => c.id == widget.sawed.customerId,
+      orElse: () => widget.customerList.first,
+    );
+
+    selectedWoodNotifier.value = widget.woodList.firstWhere(
+        (w) => w.id == widget.sawed.woodId,
+        orElse: () => widget.woodList.first);
   }
 
   @override
@@ -119,8 +123,6 @@ class _EditSawedModalState extends State<EditSawedModal> {
                             woodId: selectedWoodNotifier.value!.id!,
                           );
                           widget.onSuccess();
-
-                          Navigator.pop(context);
                         } catch (error) {
                           ErrorHandler.handleError(
                               'Error al actualizar el aserrado: $error');

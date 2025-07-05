@@ -28,6 +28,7 @@ class ScrollLayout extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
+          automaticallyImplyLeading: false,
           pinned: true,
           toolbarHeight: toolbarHeight,
           backgroundColor: backgroundColor ?? Palette(context).secondary,

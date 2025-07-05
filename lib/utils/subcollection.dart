@@ -1,64 +1,75 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:project_cipher/utils/model.dart';
 
 class Subcollection<T extends Model> {
-  final String parentCollection;
-  final String parentId;
-  final String subcollectionName;
+  final List<String> _pathSegments;
   final T Function(String id, Map<String, dynamic>) modelBuilder;
 
   Subcollection({
-    required this.parentCollection,
-    required this.parentId,
-    required this.subcollectionName,
+    required String parentCollection,
+    required String parentId,
+    required String subcollectionName,
     required this.modelBuilder,
-  });
+  }) : _pathSegments = [parentCollection, parentId, subcollectionName];
+
+  Subcollection.internal(this._pathSegments, this.modelBuilder);
 
   FirebaseFirestore get _firestore => FirebaseFirestore.instance;
 
+  Future<bool> hasInternetConnection() async {
+    final results = await Connectivity().checkConnectivity();
+    return !results.contains(ConnectivityResult.none);
+  }
+
+  /// Crea un documento
   Future<T> create(Map<String, dynamic> data) async {
-    var docRef = await _firestore
-        .collection(parentCollection)
-        .doc(parentId)
-        .collection(subcollectionName)
-        .add({
+    final colRef = _firestore.collection(_pathSegments.join('/'));
+    final docRef = await colRef.add({
       ...data,
       'created_at': FieldValue.serverTimestamp(),
       'updated_at': FieldValue.serverTimestamp(),
     });
-    T model = modelBuilder(docRef.id, data);
-    return model;
+    return modelBuilder(docRef.id, data);
   }
 
+  /// Obtiene todos los documentos
   Future<List<T>> getAll() async {
-    var querySnapshot = await _firestore
-        .collection(parentCollection)
-        .doc(parentId)
-        .collection(subcollectionName)
-        .get();
-    return querySnapshot.docs
+    final colRef = _firestore.collection(_pathSegments.join('/'));
+    final useCache = !(await hasInternetConnection());
+      final options = useCache
+          ? const GetOptions(source: Source.cache)
+          : const GetOptions(source: Source.serverAndCache);
+    final snapshot = await colRef.get(options);
+    return snapshot.docs
         .map((doc) => modelBuilder(doc.id, doc.data()))
-        .cast<T>()
         .toList();
   }
-    Future<void> update(String docId, Map<String, dynamic> data) async {
-    await _firestore
-        .collection(parentCollection)
-        .doc(parentId)
-        .collection(subcollectionName)
-        .doc(docId)
-        .update({
+
+  /// Busca un documento por ID
+  Future<T?> find(String docId) async {
+    final docRef = _firestore.doc([..._pathSegments, docId].join('/'));
+    final useCache = !(await hasInternetConnection());
+      final options = useCache
+          ? const GetOptions(source: Source.cache)
+          : const GetOptions(source: Source.serverAndCache);
+    final snapshot = await docRef.get(options);
+    if (!snapshot.exists || snapshot.data() == null) return null;
+    return modelBuilder(snapshot.id, snapshot.data()!);
+  }
+
+  /// Actualiza un documento
+  Future<void> update(String docId, Map<String, dynamic> data) async {
+    final docRef = _firestore.doc([..._pathSegments, docId].join('/'));
+    await docRef.update({
       ...data,
       'updated_at': FieldValue.serverTimestamp(),
     });
   }
 
+  /// Elimina un documento
   Future<void> delete(String docId) async {
-    await _firestore
-        .collection(parentCollection)
-        .doc(parentId)
-        .collection(subcollectionName)
-        .doc(docId)
-        .delete();
+    final docRef = _firestore.doc([..._pathSegments, docId].join('/'));
+    await docRef.delete();
   }
 }

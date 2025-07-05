@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_cipher/utils/auth_global.dart';
+import 'package:project_cipher/utils/palette.dart';
 import 'package:project_cipher/views/components/secondary_button.dart';
 import 'package:project_cipher/views/layouts/base_layout.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../controllers/auth_controller.dart';
 import 'components/danger_button.dart';
 
 class PaymentBlockedView extends StatefulWidget {
@@ -21,15 +20,22 @@ class PaymentBlockedState extends State<PaymentBlockedView> {
   String? _errorMessage;
 
   void _checkAuth() async {
+    if (!mounted) return;
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
+
     try {
       await authController.checkSession();
     } catch (e) {
-      setState(() => _errorMessage = e.toString());
-    } finally {
+      if (mounted) {
+        setState(() => _errorMessage = e.toString());
+      }
+    }
+
+    if (mounted) {
       setState(() => _isLoading = false);
     }
   }
@@ -171,14 +177,29 @@ class PaymentBlockedState extends State<PaymentBlockedView> {
             SizedBox(height: 40),
             _isLoading
                 ? CircularProgressIndicator()
-                : SecondaryButton(
-                    labelText: "Reintentar", onPressed: _checkAuth),
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 45),
+                    child: SecondaryButton(
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(0),
+                          border: Border.all(
+                            color: Palette(context).primary,
+                          ),
+                        ),
+                        color: Palette(context).primary,
+                        labelText: "Reintentar",
+                        onPressed: _checkAuth),
+                  ),
             SizedBox(height: 10),
-            DangerButton(
-                labelText: "Cerrar",
-                onPressed: () {
-                  SystemNavigator.pop();
-                })
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 45),
+              child: DangerButton(
+                  labelText: "Cerrar",
+                  onPressed: () {
+                    SystemNavigator.pop();
+                  }),
+            )
           ],
         ),
       ),

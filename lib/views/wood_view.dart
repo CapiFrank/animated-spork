@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:project_cipher/controllers/auth_controller.dart';
+import 'package:go_router/go_router.dart';
 import 'package:project_cipher/controllers/wood_controller.dart';
 import 'package:project_cipher/models/wood.dart';
 import 'package:project_cipher/utils/error_handler.dart';
@@ -9,7 +9,7 @@ import 'package:project_cipher/views/components/input_text.dart';
 import 'package:project_cipher/views/components/secondary_button.dart';
 import 'package:project_cipher/views/components/slidable_button.dart';
 import 'package:project_cipher/views/layouts/scroll_layout.dart';
-import 'package:provider/provider.dart';
+import 'package:project_cipher/views/partials/edit_wood_view.dart';
 
 class WoodView extends StatefulWidget {
   const WoodView({super.key});
@@ -29,6 +29,29 @@ class WoodViewState extends State<WoodView> {
   void initState() {
     super.initState();
     _data = _woodController.index();
+  }
+
+  void _onSubmit() {
+    if (_nameController.text.isEmpty ||
+        _priceController.text.isEmpty ||
+        _discountController.text.isEmpty) {
+      ErrorHandler.handleError('Por favor, completa todos los campos.');
+      return;
+    }
+    _woodController
+        .store(
+      name: _nameController.text,
+      pricePerUnit: double.parse(_priceController.text),
+      discount: double.parse(_discountController.text),
+    )
+        .then((_) {
+      setState(() {
+        _data = _woodController.index();
+        _nameController.clear();
+        _priceController.clear();
+        _discountController.clear();
+      });
+    });
   }
 
   @override
@@ -71,7 +94,8 @@ class WoodViewState extends State<WoodView> {
                     style: TextStyle(color: Palette(context).onPrimary),
                     decoration: customDecoration(context),
                     textEditingController: _nameController,
-                    labelText: "Nombre de la madera",
+                    textInputAction: TextInputAction.next,
+                    labelText: "Nombre",
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "El campo no puede estar vacío";
@@ -87,7 +111,8 @@ class WoodViewState extends State<WoodView> {
                     keyboardType: TextInputType.numberWithOptions(
                         decimal: true, signed: false),
                     textEditingController: _priceController,
-                    labelText: "Precio por pulgada",
+                    labelText: "Precio",
+                    textInputAction: TextInputAction.next,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "El campo no puede estar vacío";
@@ -99,6 +124,7 @@ class WoodViewState extends State<WoodView> {
                     height: 15,
                   ),
                   InputText(
+                    textInputAction: TextInputAction.send,
                     cursorColor: Palette(context).onPrimary,
                     style: TextStyle(color: Palette(context).onPrimary),
                     decoration: customDecoration(context),
@@ -106,6 +132,7 @@ class WoodViewState extends State<WoodView> {
                         decimal: true, signed: false),
                     textEditingController: _discountController,
                     labelText: "Descuento",
+                    onFieldSubmitted: (_) => _onSubmit(),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "El campo no puede estar vacío";
@@ -116,31 +143,7 @@ class WoodViewState extends State<WoodView> {
                   SizedBox(
                     height: 15,
                   ),
-                  SecondaryButton(
-                      labelText: "Agregar",
-                      onPressed: () {
-                        if (_nameController.text.isEmpty ||
-                            _priceController.text.isEmpty ||
-                            _discountController.text.isEmpty) {
-                          ErrorHandler.handleError(
-                              'Por favor, completa todos los campos.');
-                          return;
-                        }
-                        _woodController
-                            .store(
-                          name: _nameController.text,
-                          pricePerInch: double.parse(_priceController.text),
-                          discount: double.parse(_discountController.text),
-                        )
-                            .then((_) {
-                          setState(() {
-                            _data = _woodController.index();
-                            _nameController.clear();
-                            _priceController.clear();
-                            _discountController.clear();
-                          });
-                        });
-                      }),
+                  SecondaryButton(labelText: "Agregar", onPressed: _onSubmit),
                 ],
               ),
             ),
@@ -157,7 +160,22 @@ class WoodViewState extends State<WoodView> {
                           motion: const DrawerMotion(),
                           children: [
                             SlidableButton(
-                              onPressed: () => debugPrint("Editar"),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  backgroundColor: Palette(context).surface,
+                                  context: context,
+                                  isScrollControlled: true,
+                                  builder: (context) => EditWoodModal(
+                                    wood: wood,
+                                    onSuccess: () {
+                                      context.pop();
+                                      setState(() {
+                                        _data = _woodController.index();
+                                      });
+                                    },
+                                  ),
+                                );
+                              },
                               icon: Icons.edit,
                               label: 'Editar',
                               color: Colors.green,
@@ -192,7 +210,7 @@ class WoodViewState extends State<WoodView> {
                           child: ListTile(
                             title: Text(wood.name),
                             subtitle: Text(
-                                'Precio: ₡${wood.pricePerInch} por pulgada\n'
+                                'Precio: ₡${wood.pricePerUnit} por pulgada\n'
                                 'Descuento: ${wood.discount}%'),
                           ),
                         ),

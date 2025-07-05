@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:project_cipher/utils/error_handler.dart';
 
 class TimeValidator {
   static Duration? _serverTimeOffset;
 
   static Future<bool> hasInternetConnection() async {
-    final result = await Connectivity().checkConnectivity();
-    return result != ConnectivityResult.none;
+    final results = await Connectivity().checkConnectivity();
+    return !results.contains(ConnectivityResult.none);
   }
 
   static Future<void> syncWithServer() async {
@@ -36,7 +37,7 @@ class TimeValidator {
       final DateTime serverDateTime = serverTime.toDate();
       _serverTimeOffset = serverDateTime.difference(DateTime.now());
     } catch (e) {
-      print('Error al obtener el tiempo del servidor o caché: $e');
+      ErrorHandler.handleError('Error al obtener el tiempo del servidor o caché: $e');
       _serverTimeOffset = null;
     }
   }

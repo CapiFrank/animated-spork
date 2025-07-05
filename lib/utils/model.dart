@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:project_cipher/utils/circuit_breaker.dart';
+import 'package:project_cipher/utils/subcollection.dart';
 
 Future<bool> hasInternetConnection() async {
-  final result = await Connectivity().checkConnectivity();
-  return result != ConnectivityResult.none;
+  final results = await Connectivity().checkConnectivity();
+  return !results.contains(ConnectivityResult.none);
 }
 
 abstract class Model {
@@ -124,9 +125,9 @@ abstract class Model {
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
     final useCache = !(await hasInternetConnection());
-      final options = useCache
-          ? const GetOptions(source: Source.cache)
-          : const GetOptions(source: Source.serverAndCache);
+    final options = useCache
+        ? const GetOptions(source: Source.cache)
+        : const GetOptions(source: Source.serverAndCache);
     var doc = await CircuitBreaker.retry(
         () => _firestore.collection(collectionName).doc(id).get(options));
     if (!doc.exists || doc.data() == null) {
@@ -141,9 +142,9 @@ abstract class Model {
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
     final useCache = !(await hasInternetConnection());
-      final options = useCache
-          ? const GetOptions(source: Source.cache)
-          : const GetOptions(source: Source.serverAndCache);
+    final options = useCache
+        ? const GetOptions(source: Source.cache)
+        : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(
         () => _firestore.collection(collectionName).get(options));
     return querySnapshot.docs
@@ -159,9 +160,9 @@ abstract class Model {
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
     final useCache = !(await hasInternetConnection());
-      final options = useCache
-          ? const GetOptions(source: Source.cache)
-          : const GetOptions(source: Source.serverAndCache);
+    final options = useCache
+        ? const GetOptions(source: Source.cache)
+        : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(() => _firestore
         .collection(collectionName)
         .where(field, isEqualTo: value)
@@ -179,9 +180,9 @@ abstract class Model {
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
     final useCache = !(await hasInternetConnection());
-      final options = useCache
-          ? const GetOptions(source: Source.cache)
-          : const GetOptions(source: Source.serverAndCache);
+    final options = useCache
+        ? const GetOptions(source: Source.cache)
+        : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(() => _firestore
         .collection(collectionName)
         .where(field, isEqualTo: value)
@@ -199,9 +200,9 @@ abstract class Model {
     required dynamic value,
   }) async {
     final useCache = !(await hasInternetConnection());
-      final options = useCache
-          ? const GetOptions(source: Source.cache)
-          : const GetOptions(source: Source.serverAndCache);
+    final options = useCache
+        ? const GetOptions(source: Source.cache)
+        : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(() => _firestore
         .collection(collectionName)
         .where(field, isEqualTo: value)
@@ -215,9 +216,9 @@ abstract class Model {
     required String collectionName,
   }) async {
     final useCache = !(await hasInternetConnection());
-      final options = useCache
-          ? const GetOptions(source: Source.cache)
-          : const GetOptions(source: Source.serverAndCache);
+    final options = useCache
+        ? const GetOptions(source: Source.cache)
+        : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(
         () => _firestore.collection(collectionName).get(options));
     return querySnapshot.size;
@@ -231,9 +232,9 @@ abstract class Model {
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
     final useCache = !(await hasInternetConnection());
-      final options = useCache
-          ? const GetOptions(source: Source.cache)
-          : const GetOptions(source: Source.serverAndCache);
+    final options = useCache
+        ? const GetOptions(source: Source.cache)
+        : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(() => _firestore
         .collection(collectionName)
         .orderBy(field, descending: descending)
@@ -250,13 +251,37 @@ abstract class Model {
     required T Function(String id, Map<String, dynamic>) fromJson,
   }) async {
     final useCache = !(await hasInternetConnection());
-      final options = useCache
-          ? const GetOptions(source: Source.cache)
-          : const GetOptions(source: Source.serverAndCache);
+    final options = useCache
+        ? const GetOptions(source: Source.cache)
+        : const GetOptions(source: Source.serverAndCache);
     var querySnapshot = await CircuitBreaker.retry(
         () => _firestore.collection(collectionName).limit(count).get(options));
     return querySnapshot.docs
         .map((doc) => fromJson(doc.id, doc.data()))
         .toList();
+  }
+
+  static Subcollection<T> relations<T extends Model>(
+    List<dynamic> segments, {
+    required T Function(String id, Map<String, dynamic>) modelBuilder,
+  }) {
+    List<String> pathSegments = [];
+
+    for (var segment in segments) {
+      if (segment is List && segment.length == 2) {
+        // ['sawed', sawedId]
+        pathSegments.add(segment[0]);
+        pathSegments.add(segment[1]);
+      } else if (segment is String) {
+        // 'details'
+        pathSegments.add(segment);
+      } else {
+        throw ArgumentError(
+          'Invalid segment: must be a string or [collection, id]',
+        );
+      }
+    }
+
+    return Subcollection<T>.internal(pathSegments, modelBuilder);
   }
 }

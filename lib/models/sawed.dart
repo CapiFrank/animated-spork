@@ -1,8 +1,11 @@
-import '../utils/model.dart';
+import 'package:project_cipher/models/round_trunk.dart';
+import 'package:project_cipher/models/square_trunk.dart';
+import 'package:project_cipher/utils/subcollection.dart';
+import 'package:project_cipher/utils/model.dart';
 
 class Sawed extends Model {
-String customerId;
-String woodId;
+  String customerId;
+  String woodId;
 
   Sawed(
       {super.id,
@@ -19,6 +22,22 @@ String woodId;
       'created_at': createdAt,
       'updated_at': updatedAt,
     };
+  }
+
+  Subcollection<RoundTrunk> roundTrunk() {
+    return Subcollection<RoundTrunk>(
+        parentCollection: collectionName,
+        parentId: id!,
+        subcollectionName: 'round_trunks',
+        modelBuilder: RoundTrunk.fromDoc);
+  }
+
+  Subcollection<SquareTrunk> squareTrunk() {
+    return Subcollection<SquareTrunk>(
+        parentCollection: collectionName,
+        parentId: id!,
+        subcollectionName: 'square_trunks',
+        modelBuilder: SquareTrunk.fromDoc);
   }
 
   @override

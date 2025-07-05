@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_cipher/controllers/customer_controller.dart';
-import 'package:project_cipher/controllers/sawed_controller.dart';
 import 'package:project_cipher/models/customer.dart';
-import 'package:project_cipher/models/sawed.dart';
-import 'package:project_cipher/models/wood.dart';
 import 'package:project_cipher/utils/error_handler.dart';
 import 'package:project_cipher/utils/palette.dart';
-import 'package:project_cipher/views/components/dropdown_search.dart';
 import 'package:project_cipher/views/components/input_text.dart';
 import 'package:project_cipher/views/components/primary_button.dart';
 import 'package:project_cipher/views/components/secondary_button.dart';
@@ -46,6 +42,23 @@ class _EditCustomerModalState extends State<EditCustomerModal> {
     super.dispose();
   }
 
+  void _onSubmit() async {
+    if (nameController.text.isEmpty || phoneController.text.isEmpty) {
+      ErrorHandler.handleError('Ingrese un nombre y número de telefono');
+      return;
+    }
+
+    try {
+      await _controller.update(
+          id: widget.customer.id!,
+          name: nameController.text,
+          phoneNumber: phoneController.text);
+      widget.onSuccess();
+    } catch (error) {
+      ErrorHandler.handleError('Error al actualizar el aserrado: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -67,6 +80,7 @@ class _EditCustomerModalState extends State<EditCustomerModal> {
               ),
               const SizedBox(height: 15),
               InputText(
+                textInputAction: TextInputAction.next,
                 cursorColor: Palette(context).secondary,
                 style: TextStyle(color: Palette(context).secondary),
                 decoration: customDecoration(context),
@@ -81,6 +95,7 @@ class _EditCustomerModalState extends State<EditCustomerModal> {
               ),
               const SizedBox(height: 15),
               InputText(
+                textInputAction: TextInputAction.send,
                 cursorColor: Palette(context).secondary,
                 style: TextStyle(color: Palette(context).secondary),
                 decoration: customDecoration(context),
@@ -92,6 +107,7 @@ class _EditCustomerModalState extends State<EditCustomerModal> {
                 ],
                 textEditingController: phoneController,
                 labelText: "Número de teléfono",
+                onFieldSubmitted: (_) => _onSubmit(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return "El campo no puede estar vacío";
@@ -105,27 +121,7 @@ class _EditCustomerModalState extends State<EditCustomerModal> {
                   Expanded(
                     child: PrimaryButton(
                       labelText: "Guardar Cambios",
-                      onPressed: () async {
-                        if (nameController.text.isEmpty ||
-                            phoneController.text.isEmpty) {
-                          ErrorHandler.handleError(
-                              'Ingrese un nombre y número de telefono');
-                          return;
-                        }
-
-                        try {
-                          await _controller.update(
-                              id: widget.customer.id!,
-                              name: nameController.text,
-                              phoneNumber: phoneController.text);
-                          widget.onSuccess();
-
-                          Navigator.pop(context);
-                        } catch (error) {
-                          ErrorHandler.handleError(
-                              'Error al actualizar el aserrado: $error');
-                        }
-                      },
+                      onPressed: () => _onSubmit(),
                     ),
                   ),
                   SizedBox(

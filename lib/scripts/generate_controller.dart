@@ -38,12 +38,7 @@ class ${controllerName}Controller extends ChangeNotifier {
     try {
       return await Model.all<$controllerName>(
         collectionName: '$collectionName',
-        fromJson: (id, data) => $controllerName(
-          id: id,
-          text: data['text'],
-          createdAt: data['created_at'],
-          updatedAt: data['updated_at'],
-        ),
+        fromJson: $controllerName.fromDoc,
       );
     } catch (e) {
       debugPrint('🔴 Error al obtener datos: \$e');
@@ -51,10 +46,7 @@ class ${controllerName}Controller extends ChangeNotifier {
     }
   }
 
-  Future<void> store(String text) async {
-    if (text.trim().isEmpty) {
-      throw ArgumentError("El texto no puede estar vacío.");
-    }
+  Future<void> store({required String text}) async {
     try {
       var new$controllerName = $controllerName(
         text: text,
@@ -66,18 +58,12 @@ class ${controllerName}Controller extends ChangeNotifier {
     }
   }
 
-  Future<void> update(String? id, String newText) async {
-    if (id == null || newText.trim().isEmpty) {
-      throw ArgumentError("ID y texto son obligatorios.");
-    }
+  Future<void> update({required String id, required String newText}) async {
     try {
       var $variableName = await Model.find<$controllerName>(
         collectionName: '$collectionName',
         id: id,
-        fromJson: (id, data) => $controllerName(
-          id: id,
-          text: data['text'],
-        ),
+        fromJson: $controllerName.fromDoc
       );
 
       if ($variableName != null) {
@@ -91,7 +77,7 @@ class ${controllerName}Controller extends ChangeNotifier {
     }
   }
 
-  Future<void> destroy(String? id) async {
+  Future<void> destroy({required String id}) async {
     if (id == null) {
       throw ArgumentError("El ID no puede ser nulo.");
     }

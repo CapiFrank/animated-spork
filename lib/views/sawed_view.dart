@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:project_cipher/controllers/auth_controller.dart';
+import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:project_cipher/controllers/customer_controller.dart';
 import 'package:project_cipher/controllers/sawed_controller.dart';
 import 'package:project_cipher/controllers/wood_controller.dart';
@@ -9,12 +11,14 @@ import 'package:project_cipher/models/sawed.dart';
 import 'package:project_cipher/models/wood.dart';
 import 'package:project_cipher/utils/error_handler.dart';
 import 'package:project_cipher/utils/palette.dart';
+import 'package:project_cipher/utils/pdf_invoice_generator.dart';
+import 'package:project_cipher/utils/pdf_settings.dart';
+import 'package:project_cipher/utils/saw_pos_icons.dart';
 import 'package:project_cipher/views/components/dropdown_search.dart';
 import 'package:project_cipher/views/components/secondary_button.dart';
 import 'package:project_cipher/views/components/slidable_button.dart';
 import 'package:project_cipher/views/layouts/scroll_layout.dart';
 import 'package:project_cipher/views/partials/edit_sawed_view.dart';
-import 'package:provider/provider.dart';
 
 class SawedView extends StatefulWidget {
   const SawedView({super.key});
@@ -61,6 +65,7 @@ class SawedViewState extends State<SawedView> {
           final customerList = snapshot.data![1] as List<Customer>;
           final woodList = snapshot.data![2] as List<Wood>;
           return ScrollLayout(
+            toolbarHeight: 280,
             isEmpty: sawedList.isEmpty,
             showEmptyMessage: true,
             headerChild: Column(
@@ -151,26 +156,26 @@ class SawedViewState extends State<SawedView> {
             bodyChild: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  final device = sawedList[index];
+                  final sawed = sawedList[index];
 
                   final customerName = customerList
-                      .firstWhere((c) => c.id == device.customerId,
+                      .firstWhere((c) => c.id == sawed.customerId,
                           orElse: () =>
                               Customer(name: 'Desconocido', phoneNumber: ''))
                       .name;
 
                   final woodName = woodList
-                      .firstWhere((w) => w.id == device.woodId,
+                      .firstWhere((w) => w.id == sawed.woodId,
                           orElse: () => Wood(
                               name: 'Desconocida',
-                              pricePerInch: 0,
+                              pricePerUnit: 0,
                               discount: 0))
                       .name;
                   return Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 4),
                       child: Slidable(
-                        key: ValueKey(device.id),
+                        key: ValueKey(sawed.id),
                         startActionPane: ActionPane(
                           motion: const DrawerMotion(),
                           children: [
@@ -181,10 +186,11 @@ class SawedViewState extends State<SawedView> {
                                   context: context,
                                   isScrollControlled: true,
                                   builder: (context) => EditSawedModal(
-                                    sawed: device,
+                                    sawed: sawed,
                                     customerList: customerList,
                                     woodList: woodList,
                                     onSuccess: () {
+                                      context.pop();
                                       setState(() {
                                         _data = _sawedController.index();
                                       });
@@ -204,7 +210,7 @@ class SawedViewState extends State<SawedView> {
                             SlidableButton(
                               onPressed: () => _sawedController
                                   .destroy(
-                                id: device.id!,
+                                id: sawed.id!,
                               )
                                   .then((_) {
                                 setState(() {
@@ -220,14 +226,68 @@ class SawedViewState extends State<SawedView> {
                             ),
                           ],
                         ),
-                        child: Card(
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0),
-                          ),
-                          child: ListTile(
-                            title: Text(customerName),
-                            subtitle: Text(woodName),
+                        child: GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              backgroundColor: Palette(context).surface,
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) => Padding(
+                                padding: EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.of(context).viewInsets.bottom,
+                                ),
+                                child: SingleChildScrollView(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "Elige una opción",
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w500,
+                                          color: Palette(context).secondary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          _OptionBox(
+                                            icon: SawPos.woodBeam,
+                                            label: "Tronco Cuadrado",
+                                            onTap: () {
+                                              context.go('/sawed/square_trunk',
+                                                  extra: sawed);
+                                            },
+                                          ),
+                                          _OptionBox(
+                                            icon: SawPos.woodLog,
+                                            label: "Tronco Entero",
+                                            onTap: () {
+                                              context.go('/sawed/round_trunk',
+                                                  extra: sawed);
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                            ),
+                            child: ListTile(
+                              title: Text(customerName),
+                              subtitle: Text(woodName),
+                            ),
                           ),
                         ),
                       ));
@@ -239,5 +299,56 @@ class SawedViewState extends State<SawedView> {
         }
       },
     ));
+  }
+}
+
+class _OptionBox extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _OptionBox({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: Palette(context).secondary,
+              borderRadius: BorderRadius.zero,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(2, 2),
+                )
+              ],
+            ),
+            child: Icon(
+              icon,
+              size: 48,
+              color: Palette(context).onSecondary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Palette(context).secondary,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

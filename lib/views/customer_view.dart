@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:project_cipher/controllers/auth_controller.dart';
+import 'package:go_router/go_router.dart';
 import 'package:project_cipher/utils/error_handler.dart';
 import 'package:project_cipher/utils/palette.dart';
 import 'package:project_cipher/views/components/input_text.dart';
@@ -9,7 +9,6 @@ import 'package:project_cipher/views/components/secondary_button.dart';
 import 'package:project_cipher/views/components/slidable_button.dart';
 import 'package:project_cipher/views/layouts/scroll_layout.dart';
 import 'package:project_cipher/views/partials/edit_customer_view.dart';
-import 'package:provider/provider.dart';
 import '../controllers/customer_controller.dart';
 import '../models/customer.dart';
 
@@ -42,6 +41,27 @@ class CustomerViewState extends State<CustomerView> {
     super.dispose();
   }
 
+  void _onSubmit() {
+    if (nameController.text.isEmpty || phoneController.text.isEmpty) {
+      ErrorHandler.handleError('Por favor, completa todos los campos.');
+      return;
+    }
+    _customerController
+        .store(
+      name: nameController.text,
+      phoneNumber: phoneController.text,
+    )
+        .then((_) {
+      setState(() {
+        _data = _customerController.index();
+        nameController.clear();
+        phoneController.clear();
+      });
+    }).catchError((error) {
+      ErrorHandler.handleError('Error al agregar el cliente: $error');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,6 +79,7 @@ class CustomerViewState extends State<CustomerView> {
               child: Text('Ocurrió un error al cargar los dispositivos.'));
         } else {
           return ScrollLayout(
+            toolbarHeight: 280,
             isEmpty: (snapshot.hasData && snapshot.data!.isEmpty),
             showEmptyMessage: true,
             headerChild: Column(
@@ -75,6 +96,7 @@ class CustomerViewState extends State<CustomerView> {
                   height: 15,
                 ),
                 InputText(
+                  textInputAction: TextInputAction.next,
                   cursorColor: Palette(context).onPrimary,
                   style: TextStyle(color: Palette(context).onPrimary),
                   decoration: customDecoration(context),
@@ -99,6 +121,8 @@ class CustomerViewState extends State<CustomerView> {
                         .digitsOnly, // Solo acepta dígitos 0-9
                   ],
                   textEditingController: phoneController,
+                  textInputAction: TextInputAction.send,
+                  onFieldSubmitted: (_) => _onSubmit(),
                   labelText: "Número de teléfono",
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -110,31 +134,7 @@ class CustomerViewState extends State<CustomerView> {
                 SizedBox(
                   height: 15,
                 ),
-                SecondaryButton(
-                    labelText: "Agregar",
-                    onPressed: () {
-                      if (nameController.text.isEmpty ||
-                          phoneController.text.isEmpty) {
-                        ErrorHandler.handleError(
-                            'Por favor, completa todos los campos.');
-                        return;
-                      }
-                      _customerController
-                          .store(
-                        name: nameController.text,
-                        phoneNumber: phoneController.text,
-                      )
-                          .then((_) {
-                        setState(() {
-                          _data = _customerController.index();
-                          nameController.clear();
-                          phoneController.clear();
-                        });
-                      }).catchError((error) {
-                        ErrorHandler.handleError(
-                            'Error al agregar el cliente: $error');
-                      });
-                    }),
+                SecondaryButton(labelText: "Agregar", onPressed: _onSubmit),
               ],
             ),
             bodyChild: SliverList(
@@ -158,6 +158,7 @@ class CustomerViewState extends State<CustomerView> {
                                   builder: (context) => EditCustomerModal(
                                     customer: customer,
                                     onSuccess: () {
+                                      context.pop();
                                       setState(() {
                                         _data = _customerController.index();
                                       });

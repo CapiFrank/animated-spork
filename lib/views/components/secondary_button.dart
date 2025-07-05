@@ -22,7 +22,7 @@ class SecondaryButton extends StatelessWidget {
         decoration: decoration ??
             BoxDecoration(
               color: Colors.transparent,
-              borderRadius: BorderRadius.circular(0),
+              borderRadius: BorderRadius.zero,
               border: Border.all(
                 color: Palette(context).onPrimary,
               ),
